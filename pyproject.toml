@@ -26,3 +26,6 @@ dependencies = [
   "langchain-ollama",
   "langchain-community"
 ]
+
+[tool.uv]
+managed = true
