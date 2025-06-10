@@ -1,0 +1,6 @@
+.chainlit
+.files
+.venv
+/data
+/qdrant_storage
+.env

@@ -1,0 +1,130 @@
+
+0. Estructura del proyecto
+
+rag-asistente-normativa/
+│
+├── pyproject.toml           # Gestión de dependencias con uv/PEP 621
+├── README.md                # Descripción del proyecto
+├── .env                     # Variables como rutas, puerto de Qdrant, etc.
+│
+├── data/raw                    # Archivos PDF descargados
+│        └── ejemplo_ley.pdf
+├── data/processed              # Archivos PDF procesados
+│        └── ejemplo_ley.txt
+├── src/                     # Código fuente
+│   ├── ingestion/           # Ingesta y procesamiento de PDFs
+│   │   ├── extract_text.py        # Extracción de texto desde PDF
+│   │   ├── clean_text.py          # Limpieza básica
+│   │   └── chunk_text.py          # División en chunks
+│   │   └── chunk_text_section.py          # División en chunks por seccciones del documento (división por contenido del documento)
+│
+│   ├── embeddings/
+│   │   └── embedder.py            # Generación de embeddings
+│
+│   ├── vector_store/
+│   │   └── qdrant_uploader.py       # Inicialización y escritura en Qdrant
+│
+│   ├── llm/
+│   │   └── rag_pipeline.py        # Consulta: retrieval + generación
+│
+│   ├── ui/
+│   │   └── app.py                 # Aplicación Streamlit principal
+│
+│   └── config.py                 # Paths, parámetros y constantes globales
+│
+├── scripts/
+│   ├── build_index.py            # Ingesta completa (PDF → embedding → Qdrant)
+│   └── run_app.sh                # Lanzamiento streamlit y entorno
+│   └── setup_project_structure.py                # Lanzamiento para crear la estructura del proyecto
+│
+└── docker-compose.yml           # Para correr Qdrant localmente (opcional)
+
+
+1. Asegúrate de tener Python 3.12 instalado en tu sistema
+Verifica si tienes Python 3.12 instalado:
+
+python3.12 --version
+Si no lo tienes, puedes instalarlo mediante:
+
+1.1 pyenv (recomendado en Mac/Linux):
+pyenv install 3.12.2
+pyenv local 3.12.2
+
+1.2 o desde python.org (en Windows/macOS).
+
+2. Usa uv con el binario específico de Python 3.12
+Ejecuta el siguiente comando reemplazando la ruta si es necesario:
+
+uv venv --python=$(which python3.12)
+
+O si sabes la ruta absoluta de tu Python 3.12 (ejemplo en macOS con pyenv):
+
+uv venv --python=/Users/tu_usuario/.pyenv/versions/3.12.2/bin/python
+
+3. Verifica que estás en el entorno correcto
+
+source .venv/bin/activate
+python --version
+# Debería mostrar: Python 3.12.x
+
+Nota:
+uv siempre crea el entorno en .venv, por lo tanto, no necesitas pasarle un nombre o ruta extra.
+
+4. Instala torch primero:
+
+uv pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+5. Instala el resto de dependencias:
+
+uv pip install -r pyproject.toml
+
+6. Seleccionar el .venv/bin/python  en el IDE de desarrollo
+
+7. Descargar docker desktop --> Crear usuario (user, pass)
+
+8. pull the Qdrant image: https://hub.docker.com/r/qdrant/qdrant
+docker pull qdrant/qdrant
+
+8. Ejecuta este comando para iniciar Qdrant de forma persistente:
+
+docker run -d \
+  --name qdrant_local \
+  -p 6333:6333 \
+  -v $(pwd)/qdrant_storage:/qdrant/storage \
+  qdrant/qdrant
+
+9. Validar la presencia del contenedor
+docker ps
+
+10. Ejecutar:
+python src/ingestion/extract_text.py
+python src/ingestion/clean_text.py
+python src/ingestion/chunk_text_section.py
+python src/embeddings/embedder.py
+python src/vector_store/qdrant_uploader.py
+
+11. Ejecutar:
+localhost:6333/dashboard
+
+12. Descargar ollama y validar
+ollama ls
+
+13. Descargar el modelo empleado. En este caso se hace uso de dolphin-mistral
+ollama run dolphin-mistral
+
+14. Ejecutar chainlit
+chainlit run src/ui/app.py
+
+15. Observaciones
+para ejecutar una librería dentro de uv
+uv pip install tiktoken
+
+16. Copiar y pegar
+http://localhost:8000/
+
+xxx. Referencias:
+https://huggingface.co/spaces/mteb/leaderboard
+https://huggingface.co/sentence-transformers/distiluse-base-multilingual-cased-v1
+https://hub.docker.com/r/qdrant/qdrant
+https://ollama.com/search
+https://www.anthropic.com/news/contextual-retrieval
