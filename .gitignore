@@ -4,3 +4,6 @@
 /data
 /qdrant_storage
 .env
+.DS_Store
+
+**/__pycache__
