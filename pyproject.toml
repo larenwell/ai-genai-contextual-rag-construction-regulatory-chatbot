@@ -24,7 +24,8 @@ dependencies = [
   "tiktoken",
   "chainlit",
   "langchain-ollama",
-  "langchain-community"
+  "langchain-community",
+  "pinecone"
 ]
 
 [tool.uv]

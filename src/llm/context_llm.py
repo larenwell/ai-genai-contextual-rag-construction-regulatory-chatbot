@@ -22,8 +22,9 @@ Here is the chunk we want to situate within the whole document
 Please give a short succinct context to situate this chunk within the overall document for the purposes of improving search retrieval of the chunk.
 Answer only in ENGLISH with the succinct context and nothing else.
 """
-
-LLM_ASSISTANT_PROMPT = """
+#User prompt (El contexto siempre va en el user prompt)
+#System prompt (Es la )
+LLM_ASSISTANT_USER_PROMPT = """
 You are a helpful AI assistant who will answer the user's question. Based on the context given. 
 <context>
 {context}
@@ -33,6 +34,8 @@ You are a helpful AI assistant who will answer the user's question. Based on the
 {question}
 </question>
 """
+
+LLM_ASSISTANT_SYSTEM_PROMPT =""
 
 
 class LLMContext:
@@ -71,7 +74,8 @@ class LLMContext:
         response = ollama.chat(
             model=self.model_name,
             messages=[
-                {"role": "user", "content": LLM_ASSISTANT_PROMPT.format(context=context, question=message)},
+                {"role":"system","context":LLM_ASSISTANT_SYSTEM_PROMPT.format(doc_content="MODIFY")}, #FINALIZAR
+                {"role": "user", "content": LLM_ASSISTANT_USER_PROMPT.format(context=context, question=message)},
             ]
         )
 
