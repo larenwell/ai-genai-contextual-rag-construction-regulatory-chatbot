@@ -5,5 +5,7 @@
 /qdrant_storage
 .env
 .DS_Store
+uv.lock
+testing_stuff_out.py
 
 **/__pycache__
