@@ -27,7 +27,7 @@ def format_sources_for_display(context_results):
     if not matches:
         return "No se encontraron fuentes relevantes."
     
-    sources_text = "## 🤓 Fuentes consultadas:\n\n"
+    sources_text = "###  Fuentes consultadas:\n\n"
     
     for i, match in enumerate(matches, 1):
         metadata = match.get('metadata', {})
@@ -38,8 +38,8 @@ def format_sources_for_display(context_results):
         
         sources_text += f"**Fuente {i}:**\n"
         sources_text += f"- **Documento:** {title}\n"
-        sources_text += f"- **Página:** {page}\n"
-        sources_text += f"- **Relevancia:** {(score * 100):.2f}%\n\n"
+        sources_text += f"- **Página:** {page}\n\n"
+        #sources_text += f"- **Relevancia:** {(score * 100):.2f}%\n\n"
     
     return sources_text
 
@@ -50,7 +50,7 @@ embedding_admin = EmbeddingController(model_name="nomic-embed-text", pinecone_ap
 async def start():
     cl.user_session.set("history", [])
     await cl.Message(
-        content="¡Hola! 🤖 Soy tu asistente de normativa. ¿En qué puedo ayudarte?"
+        content="¡Hola!  Soy tu asistente de normativa. ¿En qué puedo ayudarte?"
     ).send()
 
 @cl.on_message
