@@ -32,27 +32,27 @@ Please give a short succinct context to situate this chunk within the overall do
 Answer only in ENGLISH with the succinct context and nothing else.
 """
 
-LLM_ASSISTANT_USER_PROMPT = """
-Answer the user's question. Based on the context given. 
-<context>
-{context}
-</context>
+# LLM_ASSISTANT_USER_PROMPT = """
+# Answer the user's question. Based on the context given. 
+# <context>
+# {context}
+# </context>
 
-<question>
-{question}
-</question>
-"""
+# <question>
+# {question}
+# </question>
+# """
 
-LLM_ASSISTANT_SYSTEM_PROMPT = """
-You are a helpful and expert assistant that always replies in Spanish, regardless of the language used in the user's input. Your primary role is to support the user in understanding, interpreting, and applying regulations, laws, and compliance requirements in various contexts (legal, administrative, technical, or corporate). You must:
-Always respond in clear and formal Spanish.
-Use structured and organized explanations, including numbered lists or bullet points when helpful.
-Include references to specific articles or clauses where applicable.
-Avoid speculation—base responses strictly on established norms or best legal/compliance practices.
-When a regulation is ambiguous or context-dependent, note that explicitly and offer possible interpretations or steps to clarify.
-Prioritize accuracy, clarity, and the user's understanding.
-Your tone should be professional, precise, and supportive—similar to that of a legal advisor or compliance officer. Never switch to English, and always assume the user is seeking help related to regulatory topics.
-"""
+# LLM_ASSISTANT_SYSTEM_PROMPT = """
+# You are a helpful and expert assistant that always replies in Spanish, regardless of the language used in the user's input. Your primary role is to support the user in understanding, interpreting, and applying regulations, laws, and compliance requirements in various contexts (legal, administrative, technical, or corporate). You must:
+# Always respond in clear and formal Spanish.
+# Use structured and organized explanations, including numbered lists or bullet points when helpful.
+# Include references to specific articles or clauses where applicable.
+# Avoid speculation—base responses strictly on established norms or best legal/compliance practices.
+# When a regulation is ambiguous or context-dependent, note that explicitly and offer possible interpretations or steps to clarify.
+# Prioritize accuracy, clarity, and the user's understanding.
+# Your tone should be professional, precise, and supportive—similar to that of a legal advisor or compliance officer. Never switch to English, and always assume the user is seeking help related to regulatory topics.
+# """
 
 
 class LLMContext:
@@ -97,16 +97,16 @@ class LLMContext:
 
         return response['message']['content']
     
-    def chat_llm(self, context, message):
-        response = ollama.chat(
-            model=self.model_name,
-            messages=[
-                {"role":"system","context":LLM_ASSISTANT_SYSTEM_PROMPT},
-                {"role": "user", "content": LLM_ASSISTANT_USER_PROMPT.format(context=context, question=message)},
-            ],
-            options={
-                "temperature": 0.1
-            }
-        )
+    # def chat_llm(self, context, message):
+    #     response = ollama.chat(
+    #         model=self.model_name,
+    #         messages=[
+    #             {"role":"system","context":LLM_ASSISTANT_SYSTEM_PROMPT},
+    #             {"role": "user", "content": LLM_ASSISTANT_USER_PROMPT.format(context=context, question=message)},
+    #         ],
+    #         options={
+    #             "temperature": 0.1
+    #         }
+    #     )
 
-        return response['message']['content']
+    #     return response['message']['content']

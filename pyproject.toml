@@ -1,9 +1,9 @@
 [project]
-name = "rag-asistente-normativa"
+name = "contextual-rag-asistente-normativa"
 version = "0.1.0"
-description = "Asistente virtual de normativa en español con RAG + Qdrant + Streamlit"
+description = "Asistente virtual de normativa en español con fuentes en inglés con Contextual RAG + Pinecone + Chainlit + Groq"
 authors = [{ name = "Laren Osorio Toribio", email = "losorio@rcp.pe" }]
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 
 dependencies = [
   "pymupdf",
@@ -25,7 +25,9 @@ dependencies = [
   "chainlit",
   "langchain-ollama",
   "langchain-community",
-  "pinecone"
+  "pinecone",
+  "groq",
+  "translate"
 ]
 
 [tool.uv]

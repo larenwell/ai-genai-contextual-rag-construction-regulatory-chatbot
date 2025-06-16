@@ -60,7 +60,7 @@ async def main(message: cl.Message):
     history.append({"role": "user", "content": message.content})
 
     # 2) Traducir la pregunta al inglés
-    message.content = translate_text(message.content)
+    message.content = translate_text(message.content) #ingles
 
     # 3) Extraer contexto del Pinecone
     embed_question = embedding_admin.generate_embeddings(message.content)
@@ -82,7 +82,8 @@ async def main(message: cl.Message):
             author="📚 Fuentes"
         ).send()
     
-    # 6) actualizar historial
+    # 6) actualizar historial. Recuerde las preguntas del chat
     history.append({"role": "assistant", "content": respuesta})
     cl.user_session.set("history", history)
-    
+
+#groq: limites de uso (1000 o 1500 querys diarias)
