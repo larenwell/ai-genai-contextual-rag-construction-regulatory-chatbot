@@ -30,7 +30,13 @@ class TextChunk:
 
 def process_pdf(pdf_path, embedding_admin, llm_dolphin):
     print(f"\nProcessing: {Path(pdf_path).name}")
-    reading = DocumentExtractionController(pdf_path)
+    reading = DocumentExtractionController(pdf_path, title=Path(pdf_path).name)
+
+    # First extract the title:
+    text_chunks_containing_title = reading.extract_text_from_pdf(start_page=0, end_page=1)
+    title = llm_dolphin.identify_title(text_chunks_containing_title)
+    reading.pdf_title = title
+    print("Title analyzed and setted. Proceeding with the actual analysis...\n")
     
     # Extract text and generate chunks
     text_chunks = reading.extract_text_from_pdf()

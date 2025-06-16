@@ -1,4 +1,5 @@
 import PyPDF2
+from datetime import datetime
 from pathlib import Path
 from dataclasses import dataclass
 from typing import List, Optional
@@ -12,25 +13,25 @@ class TextChunk:
     metadata: dict = None
 
 class DocumentExtractionController:
-    def __init__(self, pdf_path: str):
+    def __init__(self, pdf_path: str, title: str = None):
         self.pdf_path = Path(pdf_path)
         self.metadata = {
             "source": self.pdf_path.name,
             "total_pages": 0
         }
+        self.pdf_title = title
 
     def _extract_metadata(self, pdf_reader: PyPDF2.PdfReader):
         doc_info = pdf_reader.metadata
 
         return {
-            'title': doc_info.get('/Title', self.pdf_path.stem),
-            'author': doc_info.get('/Author', 'Unknown'),
-            'creator': doc_info.get('/Creator', ''),
-            'producer': doc_info.get('/Producer', ''),
-            'creation_date': doc_info.get('/CreationDate', ''),
-            'modification_date': doc_info.get('/ModDate', '')
+            'title': self.pdf_title,
+            # 'author': doc_info.get('/Author', 'Unknown'),
+            # 'creator': doc_info.get('/Creator', ''),
+            # 'producer': doc_info.get('/Producer', ''),
+            'creation_date': datetime.now().strftime('%d-%m-%Y'),
+            'modification_date': datetime.now().strftime('%d-%m-%Y')
         }
-        
 
     def extract_text_from_pdf(self, start_page: int = 0, end_page: int = None) -> List[TextChunk]:
         try:
