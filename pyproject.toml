@@ -27,7 +27,8 @@ dependencies = [
   "langchain-community",
   "pinecone",
   "groq",
-  "translate"
+  "translate",
+  "ragas"
 ]
 
 [tool.uv]

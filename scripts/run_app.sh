@@ -9,5 +9,3 @@ source .venv/bin/activate
 
 # 3) Lanza la UI de Chainlit (o Streamlit si prefieres)
 chainlit run src/ui/app.py
-
-s
