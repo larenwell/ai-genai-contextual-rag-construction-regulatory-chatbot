@@ -72,12 +72,19 @@ class MistralExtractionController:
             response_dict = json.loads(pdf_response.model_dump_json())
             print(f"📋 Estructura de respuesta: {list(response_dict.keys())}")
             
-            # Extraer el contenido markdown
-            # La estructura de respuesta de Mistral OCR tiene el contenido en pages[0]['markdown']
+            # Extraer el contenido markdown de todas las páginas
             pages = response_dict.get("pages", [])
+            print(f"📋 Número total de páginas detectadas: {len(pages)}")
+            
             if pages and len(pages) > 0:
-                markdown_content = pages[0].get("markdown", "")
-                print(f"✅ Contenido extraído de pages[0]['markdown']: {len(markdown_content)} caracteres")
+                # Concatenar contenido de todas las páginas
+                markdown_content = ""
+                for i, page in enumerate(pages):
+                    page_content = page.get("markdown", "")
+                    markdown_content += f"\n\n--- PÁGINA {i+1} ---\n\n{page_content}"
+                    print(f"✅ Página {i+1}: {len(page_content)} caracteres")
+                
+                print(f"✅ Contenido total extraído: {len(markdown_content)} caracteres")
             else:
                 # Fallback al campo 'content' directo
                 markdown_content = response_dict.get("content", "")
