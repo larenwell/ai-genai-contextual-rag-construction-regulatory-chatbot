@@ -70,7 +70,8 @@ def process_pdf(pdf_path, embedding_admin, llm_dolphin):
     embeddings = [embedding_admin.generate_embeddings(chunk.text) 
                  for chunk in contextualized_chunks]
     
-    return embeddings, contextualized_chunks
+    return embeddings, contextualized_chunks #el embedding apunta al chunk contextualizado. A diferencia del RAG tradicional no se tiene el texti crudo sino a partir de la idea principal de todo el texto se genera un chunk contextualizado.
+    #[]
 
 def main():
     embedding_admin = EmbeddingController(model_name="nomic-embed-text", pinecone_api_key=PINECONE_API_KEY, pinecone_index=PINECONE_INDEX)
@@ -90,10 +91,10 @@ def main():
     all_chunks = []
     
     for pdf_path in pdf_files:
-        embeddings, chunks = process_pdf(pdf_path, embedding_admin, llm_dolphin)
-        all_embeddings.extend(embeddings)
+        embeddings, chunks = process_pdf(pdf_path, embedding_admin, llm_dolphin) #Es una lista de todos los chunks y los embeddings de estos chunks.
+        all_embeddings.extend(embeddings) #extender la lista, le mete como un elemento no como una lista
         all_chunks.extend([c.text for c in chunks])
-        all_metadata.extend([c.metadata for c in chunks])
+        all_metadata.extend([c.metadata for c in chunks]) #chunks, tiene texto como metadata
     
     # Store all embeddings in Pinecone
     if all_embeddings:
@@ -110,3 +111,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# Para ingestación se corre ollama local porque no hay ningun restricción

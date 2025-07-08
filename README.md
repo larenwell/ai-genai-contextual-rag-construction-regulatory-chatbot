@@ -1,245 +1,321 @@
-# Titulo: Asistente Virtual de Normativa Legal
+# Enhanced Mistral OCR Contextual RAG Assistant
 
-## Descripción
-Este proyecto implementa un asistente virtual de consulta de normativa legal en español usando una arquitectura RAG (Retrieval-Augmented Generation).  
-Se ingieren documentos PDF, se procesan (limpieza, chunking por secciones y tokens), se generan embeddings con **multilingual-e5-large-instruct**, se indexan en **Qdrant**, se emplea **Ollama** como gestor de LLM ([dolphin-mistral](https://ollama.com/library/dolphin-mistral)) y se exponen a través de una UI ligera con **Chainlit**
+## Project Description
 
-## Objetivo
-Permitir a usuarios realizar preguntas en lenguaje natural sobre textos normativos (leyes, reglamentos, etc.) y obtener respuestas precisas basadas en el contenido real de los documentos.
+This project implements an advanced **Contextual Retrieval-Augmented Generation (RAG)** system that leverages **Mistral OCR** to process both text and visual content from regulatory documents. The system goes beyond traditional RAG by incorporating AI-enhanced document understanding, visual element analysis, and intelligent annotations to provide superior search relevance and contextual responses.
 
-## Descripción de los módulos empleados
+**Key Innovation**: This implementation uses **Mistral OCR** for multimodal document processing, combining text extraction with visual understanding (diagrams, charts, tables, formulas) and contextual enhancement using AI to create superior embeddings for regulatory compliance assistance.
 
-1. **Ingesta de documentos**  
-   - Descarga y almacenamiento de PDFs normativos en `data/raw/`.  
-   - Extracción de texto con PyMuPDF (`extract_text.py`).
+## Scope
 
-2. **Procesamiento y chunking**  
-   - Limpieza de texto: eliminación de cabeceras, espacios y saltos de línea innecesarios (`clean_text.py`).  
-   - División inteligente por secciones (títulos, artículos) y/o tokens para garantizar que cada fragmento no supere el límite del modelo (`chunk_text_section.py`, `chunk_text.py`).
+The system encompasses the following key areas:
 
-3. **Generación de embeddings**  
-   - Uso de `multilingual-e5-large-instruct` (SentenceTransformers) para convertir cada chunk en un vector de 1 024 dimensiones, normalizado en L2 (`embedder.py`).
+- **Multimodal Document Processing**: PDF extraction with Mistral OCR for text, images, tables, and diagrams
+- **Visual Element Understanding**: AI-powered analysis of charts, formulas, and technical diagrams
+- **Contextual Document Processing**: AI-enhanced contextual understanding using Mistral models
+- **Intelligent Annotation System**: Automatic detection and tagging of requirements, warnings, and important notes
+- **Batch Processing**: Efficient processing of multiple documents with progress tracking
+- **Multilingual Support**: Spanish user interface with English document processing
+- **Contextual Vector Search**: Semantic similarity search using contextually enhanced embeddings
+- **AI-Powered Responses**: Contextual answers using advanced LLM models
+- **Quality Assurance**: Comprehensive evaluation framework with visual content assessment
 
-4. **Indexado en Qdrant**  
-   - Despliegue de Qdrant en Docker con almacenamiento persistente.  
-   - Subida de vectores + metadatos (ID, texto) a la colección `normativa` para búsquedas semánticas de alta velocidad (`qdrant_uploader.py`).
+## Objectives
 
-5. **Pipeline RAG**  
-   - Embedding de la consulta del usuario.  
-   - Recuperación de los Top-K chunks más relevantes desde Qdrant.  
-   - Construcción de prompt unificado:  
-     ```
-     Basado en la pregunta del usuario y el contexto dado, responde la pregunta:
-     
-     === CONTEXT ===
-     <chunk1>
-     ---
-     <chunk2>
-     …
-     
-     User Query: <consulta>
-     Answer:
-     ```
-   - Generación de la respuesta con Ollama LLM (`dolphin-mistral`) a través de su API Python (`rag_pipeline.py`).
+### Primary Objectives
+1. **Multimodal Regulatory Compliance**: Process text and visual content for comprehensive regulatory assistance
+2. **Visual Understanding**: Extract and understand diagrams, charts, tables, and formulas
+3. **Contextual Retrieval**: Implement AI-enhanced document chunking with visual context
+4. **Intelligent Annotations**: Automatically detect and highlight regulatory requirements and important information
+5. **Batch Processing**: Efficient processing of large document collections
+6. **Professional Communication**: Maintain formal, precise, and professional tone
 
-6. **Interfaz de usuario**  
-   - Chat ligero construido con Chainlit (o Streamlit): permite conversación en tiempo real, historial de preguntas y respuestas, y despliegue rápido en `http://localhost:8000` (`app.py`).
+### Technical Objectives
+1. **Mistral OCR Integration**: Seamless integration with Mistral's OCR capabilities
+2. **Visual Context Preservation**: Maintain visual context in document chunks
+3. **Scalable Architecture**: Modular design for easy maintenance and extension
+4. **Performance Optimization**: Efficient multimodal document processing
+5. **Quality Assurance**: Comprehensive evaluation framework for multimodal content
 
-7. **Automatización y despliegue**  
-   - Scripts de orquestación (`build_index.py`, `run_app.sh`) para ejecutar todo el flujo end-to-end con un solo comando.  
-   - Opcional: `docker-compose.yml` para levantar Qdrant y servicios auxiliares en producción.
+## Implementation Guide
 
-## Arquitectura Global
+### Prerequisites
 
-```mermaid
----
-config:
-  look: neo
-  layout: fixed
-  theme: mc
----
-flowchart LR
- subgraph Data["📂 data/"]
-        A["raw PDFs"]
-        B["extract_text.py"]
-        C["clean_text.py"]
-        D["chunk_text_section.py"]
-  end
- subgraph Embeddings["🔢 Generación de Embeddings"]
-        E["embedder.py"]
-        F["*.json
-        (id, text, vector)"]
-  end
- subgraph VectorStore["📦 Qdrant"]
-        G["qdrant_uploader.py"]
-        H["Colección normativa"]
-  end
- subgraph RAG["🤖 Pipeline RAG"]
-        I["User Query"]
-        J["encode (user_query)"]
-        K["Qdrant search
-        (top-K vectors)"]
-        L["chunks relevantes 
-        (contextos)"]
-        M["Build prompt
-        (contextos + user_query)"]
-        N["ollama.chat
-        (dolphin-mistral)"]
-        O["Respuesta generada"]
-  end
- subgraph UI["💬 Interfaz"]
-        P["app.py
-        Chainlit"]
-  end
-    A --> B
-    B --> C
-    C --> D
-    D --> E
-    E --> F
-    F --> G
-    G --> H
-    I --> J
-    J --> K
-    K --> H
-    H --> L
-    L --> M
-    M --> N
-    N --> O
-    O --> P
-    P --> I
-```
+- Python 3.12 or higher
+- Mistral AI API key with OCR access
+- Vector database (Pinecone, Qdrant, or similar)
+- Docker and Docker Compose (for local services)
 
-![alt text](image.png)
+### Installation
 
-## Guía de instalación y puesta en marcha
-
-1. **Clonar este repositorio**  
-
+1. **Clone the repository**
    ```bash
-   git clone <tu-repo-url> rag-asistente-normativa
+   git clone <repository-url>
    cd rag-asistente-normativa
    ```
 
-2. **Instalar Python > 3.12**
+2. **Install dependencies**
+   ```bash
+   uv sync
+   ```
 
-    Verifica:
+3. **Create and activate virtual environment**
+   ```bash
+   source .venv/bin/activate
+   python --version  # should show 3.12.x
+   ```
 
-    ```bash
-    python --version
-    ```
-    2.1 Si no lo tienes, instala con pyenv (macOS/Linux):
+4. **Set up environment variables**
+   Create a `.env` file in the project root:
+   ```env
+   MISTRAL_API_KEY=your_mistral_api_key
+   PINECONE_API_KEY=your_pinecone_api_key
+   PINECONE_INDEX=your_pinecone_index_name
+   ```
 
-    ```bash
-    pyenv install 3.12.7
-    pyenv local 3.12.7
-    ```
+### Project Structure
 
-    2.2 o desde python.org
-
-3. **Crear y activar el virtualenv**
-    ```bash
-    uv sync
-    source .venv/bin/activate
-    python --version  # debe mostrar 3.12.x
-    ```
-
-4. **Instalar primero PyTorch (CPU)**
-    ```bash
-    uv pip install torch --index-url https://download.pytorch.org/whl/cpu
-    ```
-
-5. **Instalar el resto de dependencias**
-    ```bash
-    uv pip install -r pyproject.toml
-    ```
-
-    También se puede emplear uv sync y luego source .venv/bin/activate
-6. **Configurar el IDE**
-
-    Apuntar al intérprete .venv/bin/python.
-
-7. **Docker & Qdrant**
-
-    7.1 Instalar Docker Desktop y realizar login:
-
-    ```bash
-    docker login
-    ```
-
-    7.2 Descargar la imagen
-
-    ```bash
-    docker pull qdrant/qdrant
-    ```
-
-    7.3 Iniciar un contenedor persistente:
-
-    ```bash
-    docker run -d \
-        --name qdrant_local \
-        -p 6333:6333 \
-        -v $(pwd)/qdrant_storage:/qdrant/storage \
-        qdrant/qdrant
-    ```
-
-    7.4 Validar:
-
-    ```bash
-    docker ps
-    ```
-
-8. **Preprocesamiento y construcción del índice**
-
-    ```bash
-    python src/ingestion/extract_text.py
-    python src/ingestion/clean_text.py
-    python src/ingestion/chunk_text_section.py
-    python src/embeddings/embedder.py
-    python src/vector_store/qdrant_uploader.py
-    ```
-
-9. **Verifica el dashboard de Qdrant**
-
-    Abre en tu navegador: http://localhost:6333/dashboard
-
-10. **Instala y prepara Ollama**
-
-    ```bash
-    ollama ls
-    ollama run dolphin-mistral
-    ```
-
-11. **Arranca la UI con Chainlit**
-
-    ```bash
-    ollama ls
-    chainlit run src/ui/app.py
-    ```
-    
-    Abre tu navegador en http://localhost:8000/
-
-## Observaciones
-
-Para chunks basados en tokens necesitarás tiktoken:
-
-```bash
-uv pip install tiktoken 
+```
+rag-asistente-normativa/
+├── src/
+│   ├── ingestion/
+│   │   ├── ingest_mistral.py              # Original Mistral OCR implementation
+│   │   ├── enhanced_mistral_ocr.py        # Enhanced OCR with visual understanding
+│   │   └── batch_processor.py             # Batch processing utilities
+│   ├── embeddings/
+│   │   └── embedding_funcs.py             # Vector embedding management
+│   ├── llm/
+│   │   ├── context_llm.py                 # Contextual LLM processing
+│   │   └── groq_llm.py                    # Response generation
+│   ├── translation/
+│   │   └── translate.py                   # Text translation utilities
+│   └── rag_process.py                     # Main RAG processing logic
+├── scripts/
+│   ├── run_batch_processing.py            # Batch processing script
+│   └── run_evaluation.sh                  # Evaluation execution script
+├── output/                                # Processing results and reports
+├── docker-compose.yml                     # Local service configuration
+└── pyproject.toml                         # Project dependencies
 ```
 
-Puedes usar Streamlit en vez de Chainlit editando src/ui/app.py y lanzando:
+## Implementation Details
 
-```bash
-streamlit run src/ui/app.py
+### Core Components
+
+#### 1. Enhanced Mistral OCR Processing (`src/ingestion/enhanced_mistral_ocr.py`)
+- **Multimodal Extraction**: Text, images, tables, diagrams, and formulas
+- **Visual Element Detection**: AI-powered identification of visual content
+- **Contextual Enhancement**: AI-enhanced chunks with visual context
+- **Annotation System**: Automatic detection of requirements, warnings, and important notes
+- **Batch Processing**: Efficient handling of multiple documents
+
+#### 2. Visual Element Understanding
+- **Image Analysis**: Captioning and description of diagrams and charts
+- **Table Processing**: Structure preservation and content extraction
+- **Formula Recognition**: Mathematical expression understanding
+- **Diagram Interpretation**: Technical diagram analysis and description
+
+#### 3. Intelligent Annotation System
+- **Requirement Detection**: Automatic identification of regulatory requirements
+- **Warning Recognition**: Detection of safety warnings and cautions
+- **Importance Scoring**: Priority-based annotation system
+- **Expert Notes**: Contextual annotations for enhanced understanding
+
+#### 4. Batch Processing (`src/ingestion/batch_processor.py`)
+- **Concurrent Processing**: Controlled parallel document processing
+- **Progress Tracking**: Real-time processing status and metrics
+- **Error Handling**: Robust error recovery and reporting
+- **Result Management**: Organized output with detailed reports
+
+#### 5. Contextual Vector Embedding System
+- **Multimodal Embeddings**: Text and visual content representation
+- **Context Preservation**: Visual context in embedding generation
+- **Annotation Integration**: Annotation-aware search capabilities
+- **Scalable Storage**: Efficient vector database management
+
+### Key Features
+
+#### Multimodal Processing
+- **Text + Visual**: Combined processing of text and visual content
+- **Context Preservation**: Visual context maintained in chunks
+- **Enhanced Search**: Visual elements improve search relevance
+- **Comprehensive Understanding**: Full document comprehension
+
+#### Intelligent Annotations
+- **Automatic Detection**: AI-powered annotation identification
+- **Priority System**: Critical, high, medium, low priority levels
+- **Expert Integration**: Support for manual expert annotations
+- **Search Enhancement**: Annotations improve retrieval accuracy
+
+#### Batch Processing
+- **Scalable**: Process hundreds of documents efficiently
+- **Concurrent**: Parallel processing with controlled concurrency
+- **Monitoring**: Real-time progress tracking and reporting
+- **Error Recovery**: Robust error handling and recovery
+
+#### Visual Understanding
+- **Diagram Analysis**: Technical diagram interpretation
+- **Chart Recognition**: Data visualization understanding
+- **Table Processing**: Structured data extraction
+- **Formula Interpretation**: Mathematical expression analysis
+
+### Configuration
+
+#### Environment Variables
+```env
+MISTRAL_API_KEY=your_mistral_api_key
+PINECONE_API_KEY=your_pinecone_api_key
+PINECONE_INDEX=your_pinecone_index_name
 ```
 
-## Referencias
+#### Model Configuration
+- **OCR Model**: `mistral-ocr-latest`
+- **Contextual LLM**: `mistral-large-latest`
+- **Embedding Model**: `nomic-embed-text` (768 dimensions)
+- **Chunk Size**: 1200 characters
+- **Chunk Overlap**: 300 characters
+- **Max Concurrent**: 3 documents (configurable)
 
-- [RAG: Retrieval-Augmented Generation](https://medium.com/@tejpal.abhyuday/retrieval-augmented-generation-rag-from-basics-to-advanced-a2b068fd576c)
-- [Chat Assistant using RAG](https://lightning.ai/lightning-ai/studios/document-chat-assistant-using-rag?section=featured)
-- [MTEB Leaderboard](https://huggingface.co/spaces/mteb/leaderboard)
-- [distiluse-base-multilingual-cased-v1](https://huggingface.co/sentence-transformers/distiluse-base-multilingual-cased-v1)
-- [Qdrant Docker Hub](https://hub.docker.com/r/qdrant/qdrant)
-- [Ollama Models](https://ollama.com/search)
-- [Ollama Models: dolphin-mistral](https://ollama.com/library/dolphin-mistral)  
-- [Chainlit](https://docs.chainlit.io/get-started/overview)
-- [Anthropic: Contextual Retrieval](https://www.anthropic.com/news/contextual-retrieval)
+### Usage
+
+#### Single Document Processing
+```python
+from src.ingestion.enhanced_mistral_ocr import EnhancedMistralOCRController
+
+controller = EnhancedMistralOCRController(api_key="your_mistral_api_key")
+enhanced_chunks = await controller.process_single_document(
+    pdf_path="document.pdf",
+    book_title="Technical Guide"
+)
+```
+
+#### Batch Processing
+```python
+from src.ingestion.batch_processor import BatchProcessor
+
+processor = BatchProcessor(api_key="your_mistral_api_key")
+results = await processor.process_documents_batch(
+    pdf_paths=["doc1.pdf", "doc2.pdf", "doc3.pdf"],
+    book_titles=["Guide 1", "Guide 2", "Guide 3"],
+    max_concurrent=2
+)
+```
+
+#### Running Batch Processing Script
+```bash
+python scripts/run_batch_processing.py
+```
+
+### Visual Processing Workflow
+
+#### 1. Document Analysis
+```python
+# Extract content with visual elements
+extraction_result = await controller.extract_content_mistral_ocr_async(pdf_path)
+```
+
+#### 2. Visual Element Detection
+```python
+# Identify and analyze visual elements
+visual_elements = controller.extract_visual_elements_enhanced(chunk_content)
+```
+
+#### 3. Contextual Enhancement
+```python
+# Enhance chunks with visual context
+enhanced_chunk = await controller.contextualize_chunk_enhanced(
+    chunk, document_summary, book_title, page_num, visual_elements
+)
+```
+
+#### 4. Annotation Extraction
+```python
+# Extract intelligent annotations
+annotations = controller.extract_annotations(chunk_content, chunk_id)
+```
+
+### API Limits and Considerations
+
+#### Mistral OCR Limits
+- **Document Size**: Maximum 50MB per document
+- **Processing Time**: Varies by document complexity
+- **Concurrent Requests**: Rate limiting considerations
+- **Cost Optimization**: Efficient batch processing strategies
+
+#### Batch Processing Considerations
+- **Memory Usage**: Large document collections require adequate RAM
+- **Processing Time**: Visual content increases processing time
+- **Error Recovery**: Robust error handling for large batches
+- **Storage Requirements**: Enhanced chunks require more storage
+
+### Performance Optimization
+
+#### Visual Processing
+- **Parallel Analysis**: Concurrent visual element processing
+- **Memory Management**: Efficient handling of large images
+- **Caching Strategies**: Cache visual analysis results
+
+#### Batch Processing
+- **Concurrency Control**: Optimal parallel processing levels
+- **Resource Management**: Efficient memory and CPU usage
+- **Progress Monitoring**: Real-time status updates
+
+#### Vector Search
+- **Multimodal Indexing**: Efficient visual content indexing
+- **Query Optimization**: Enhanced search with visual context
+- **Result Ranking**: Improved relevance with visual elements
+
+### Security and Compliance
+
+#### Data Privacy
+- **Local Processing**: Sensitive document processing options
+- **Secure API**: Encrypted API communication
+- **No Data Retention**: No persistent storage of sensitive content
+
+#### Regulatory Compliance
+- **Source Traceability**: Complete audit trail
+- **Visual Evidence**: Visual content preservation
+- **Annotation Tracking**: Annotation history and sources
+
+### Monitoring and Evaluation
+
+#### Performance Metrics
+- **Processing Accuracy**: Text and visual extraction quality
+- **Visual Understanding**: Diagram and chart interpretation accuracy
+- **Annotation Quality**: Requirement and warning detection accuracy
+- **Search Relevance**: Enhanced retrieval performance
+
+#### Quality Assessment
+- **Multimodal Evaluation**: Text and visual content assessment
+- **Annotation Validation**: Expert review of automatic annotations
+- **User Satisfaction**: End-user feedback on responses
+
+### Future Enhancements
+
+#### Planned Features
+- **Advanced Visual Analysis**: Deep learning for complex diagrams
+- **Interactive Annotations**: User-editable annotation system
+- **Real-time Processing**: Live document processing capabilities
+- **Integration APIs**: Third-party system integration
+
+#### Technical Improvements
+- **Enhanced Visual Models**: Specialized models for technical content
+- **Advanced Annotation Types**: Domain-specific annotation categories
+- **Performance Optimization**: Faster processing and reduced costs
+- **Extended Evaluation**: Comprehensive multimodal assessment
+
+## Support and Maintenance
+
+### Troubleshooting
+- **API Configuration**: Verify Mistral API key and permissions
+- **Document Format**: Ensure PDF compatibility
+- **Processing Errors**: Check error logs and recovery options
+- **Performance Issues**: Monitor resource usage and optimization
+
+### Maintenance Tasks
+- **Regular Updates**: Keep dependencies and models current
+- **Performance Monitoring**: Track processing efficiency
+- **Quality Assurance**: Regular evaluation of output quality
+- **Documentation Updates**: Keep implementation guides current
+
+This enhanced implementation provides a robust, scalable solution for multimodal regulatory compliance assistance with superior visual understanding and intelligent annotation capabilities. The **Mistral OCR integration** sets this system apart by providing comprehensive document understanding that goes beyond traditional text-only RAG systems. 

@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from embeddings.embedding_funcs import EmbeddingController
 from ingestion.ingest_mistral import MistralExtractionController
 
-PDF_PATH = "/Users/jose/Documents/GitHub/ai-genai-dolphin-mistral-qdrant-regulatory-assistant-rag/data/Guia-Tecnica-001-OS-DSR-UTH.pdf"
+PDF_PATH = "data/Guia-Tecnica-001-OS-DSR-UTH.pdf"
 
 project_root = Path(__file__).parent.parent
 sys.path.append(str(project_root))
@@ -98,6 +98,26 @@ def save_results(enhanced_chunks, output_dir):
 
 
 def test_full_mistral_pipeline():
+    # Verificar que el archivo existe
+    if not os.path.exists(PDF_PATH):
+        print(f"❌ Error: El archivo {PDF_PATH} no existe")
+        print(f"📁 Directorio actual: {os.getcwd()}")
+        print(f"📁 Archivos en data/: {os.listdir('data') if os.path.exists('data') else 'No existe directorio data'}")
+        return
+
+    # Verificar API keys
+    if not MISTRAL_API_KEY:
+        print("❌ Error: MISTRAL_API_KEY no está configurada")
+        return
+    
+    if not PINECONE_API_KEY:
+        print("❌ Error: PINECONE_API_KEY no está configurada")
+        return
+
+    print(f"✅ Archivo encontrado: {PDF_PATH}")
+    print(f"✅ MISTRAL_API_KEY configurada: {'Sí' if MISTRAL_API_KEY else 'No'}")
+    print(f"✅ PINECONE_API_KEY configurada: {'Sí' if PINECONE_API_KEY else 'No'}")
+
     mistral_controller = MistralExtractionController(api_key=MISTRAL_API_KEY)
     embedding_controller = EmbeddingController(
         model_name="nomic-embed-text", 
@@ -107,11 +127,21 @@ def test_full_mistral_pipeline():
 
     try:
         # Procesar documento completo
+        print(f"\n🔄 Iniciando procesamiento de: {PDF_PATH}")
         enhanced_chunks = mistral_controller.process_document(
             PDF_PATH, 
             book_title="Guía Técnica 001-OS-DSR-UTH"
         )
 
+        if enhanced_chunks is None:
+            print("❌ Error: process_document retornó None. Revisa los logs anteriores.")
+            return
+
+        if len(enhanced_chunks) == 0:
+            print("❌ Error: No se generaron chunks. Revisa los logs anteriores.")
+            return
+
+        print(f"✅ Procesamiento completado: {len(enhanced_chunks)} chunks generados")
         save_results(enhanced_chunks, OUTPUT_DIR)
 
         print("\n=== EJEMPLO DE CHUNK CONTEXTUALIZADO ===")
@@ -122,20 +152,24 @@ def test_full_mistral_pipeline():
         print(f"Contenido: {example_chunk['content'][:300]}...")
 
         # Generar embeddings
+        print(f"\n🔄 Generando embeddings para {len(enhanced_chunks)} chunks...")
         embeddings = []
         for i, chunk in enumerate(enhanced_chunks):
             print(f"   Generando embedding {i+1}/{len(enhanced_chunks)}")
             embedding = embedding_controller.generate_embeddings(chunk["content"])
             embeddings.append(embedding)
 
-        print(f"\nEmbeddings generados con éxito. {len(embeddings)} embeddings generados.")
+        print(f"✅ Embeddings generados con éxito. {len(embeddings)} embeddings generados.")
 
-        # # Almacenar embeddings
-        # embedding_controller.store_embeddings(embeddings, enhanced_chunks)
-        # print("Almacenamiento en Pinecone completado con éxito.")
+        # Almacenar embeddings
+        embedding_controller.store_embeddings(embeddings, enhanced_chunks)
+        print("Almacenamiento en Pinecone completado con éxito.")
 
     except Exception as e:
-        print(f"Error al procesar el documento: {str(e)}")
+        print(f"❌ Error al procesar el documento: {str(e)}")
+        import traceback
+        print(f"📋 Traceback completo:")
+        traceback.print_exc()
 
 
 if __name__ == "__main__":

@@ -25,7 +25,8 @@ dependencies = [
   "chainlit",
   "langchain-ollama",
   "langchain-community",
-  "pinecone"
+  "pinecone",
+  "mistralai"
 ]
 
 [tool.uv]

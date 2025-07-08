@@ -1,0 +1,24 @@
+[
+  {
+    "chunk_id": 0,
+    "content": "### Resumen Contextualizado del Fragmento\n\n#### **Contenido y Relación con el Documento Completo**\nEl fragmento visualizado corresponde a las páginas iniciales de la **Guía Técnica 001-OS-DSR-UTH**, enfocada en la identificación y gestión de **áreas clasificadas como peligrosas** en instalaciones de combustibles líquidos. Este fragmento introduce el documento, proporcionando un contexto general sobre su alcance y objetivos, alineados con la **seguridad en el manejo y despacho de combustibles líquidos**.\n\n#### **Información Técnica Clave**\n- **Áreas clasificadas como peligrosas**: Se destacan como zonas con riesgo de explosión debido a la presencia de vapores inflamables.\n- **Normativas de seguridad**: Se mencionan como esenciales para prevenir accidentes en áreas de riesgo.\n- **Aplicación**: Dirigido a personal técnico y operadores de grifos, estaciones de servicio y gasocentros de GLP.\n\n#### **Descripción de Elementos Visuales**\n1. **Imagen 0 (img-0.jpeg)**: Representa un diagrama de una estación de servicio, destacando las **zonas de riesgo** y la distribución de equipos de seguridad. Este diagrama es crucial para visualizar la aplicación práctica de las normativas de seguridad en áreas peligrosas.\n2. **Imagen 1 (img-1.jpeg)**: Muestra una tabla de clasificación de áreas peligrosas según el tipo de combustible y condiciones ambientales. Esta tabla es una herramienta técnica esencial para la identificación y delimitación de zonas de riesgo.\n\n#### **Terminología Específica para Búsqueda**\n- Áreas clasificadas como peligrosas\n- Grifos\n- Estaciones de servicio\n- Gasocentros de GLP\n- Normativas de seguridad\n- Vapores inflamables\n- Diagrama de zonas de riesgo\n- Tabla de clasificación de áreas peligrosas\n\n#### **Conclusión**\nEste fragmento establece las bases para entender la importancia de la identificación y gestión de áreas peligrosas en instalaciones de combustibles líquidos. Los elementos visuales proporcionan herramientas prácticas para la aplicación de las normativas de seguridad, facilitando la comprensión y el cumplimiento de los protocolos establecidos en el documento completo.",
+    "metadata": {
+      "chunk_type": "full_text",
+      "visual_summary": "Contiene 2 imágenes/figuras",
+      "has_images": true,
+      "has_tables": false,
+      "has_formulas": false
+    }
+  },
+  {
+    "chunk_id": 1,
+    "content": "### Resumen Contextualizado del Fragmento: \"Áreas clasificadas como peligrosas en grifos, estaciones de servicio y gasocentros de GLP\"\n\n#### Contexto en el Documento Completo\nEste fragmento se enmarca dentro de la **Guía Técnica Nº 001-OS/DSR-UTH**, que aborda la identificación y gestión de áreas peligrosas en instalaciones de combustibles líquidos. El fragmento se centra específicamente en la clasificación de estas áreas en grifos, estaciones de servicio y gasocentros de GLP, temas que son fundamentales para garantizar la seguridad en el manejo y despacho de combustibles.\n\n#### Información Técnica Clave\n- **Áreas clasificadas como peligrosas**: Se refieren a zonas donde la concentración de vapores inflamables puede generar riesgos de explosión. Estas áreas son críticas en instalaciones que manejan combustibles líquidos como gasolina, diésel y GLP.\n- **Grifos y estaciones de servicio**: Instalaciones donde se despacha combustible líquido a vehículos, requiriendo protocolos estrictos para prevenir accidentes.\n- **Gasocentros de GLP**: Estaciones especializadas en la distribución de Gas Licuado de Petróleo, que también presentan riesgos asociados a la inflamabilidad del GLP.\n\n#### Elementos Visuales\nEl fragmento no incluye elementos visuales, siendo únicamente texto. Sin embargo, en el documento completo se encuentran tablas, diagramas y fórmulas que complementan la información técnica sobre la clasificación y gestión de áreas peligrosas.\n\n#### Terminología Específica\n- **Combustibles líquidos**: Incluye gasolina, diésel y GLP.\n- **Vapores inflamables**: Gases derivados de los combustibles líquidos que pueden explotar en presencia de una fuente de ignición.\n- **Normativas de seguridad**: Reglas y procedimientos para operar en áreas peligrosas.\n\n#### Conclusión\nEste fragmento es esencial para entender cómo se clasifican y gestionan las áreas peligrosas en instalaciones de combustibles líquidos. Su aplicación es crucial para cumplir con las normativas de seguridad y prevenir accidentes en grifos, estaciones de servicio y gasocentros de GLP.",
+    "metadata": {
+      "chunk_type": "structured_section",
+      "visual_summary": "Solo texto",
+      "has_images": false,
+      "has_tables": false,
+      "has_formulas": false
+    }
+  }
+]

@@ -51,23 +51,44 @@ class MistralExtractionController:
             
             # Llamar a la API OCR
             print("Procesando con Mistral OCR...")
-            pdf_response = self.mistral_client.ocr.process(
-                model="mistral-ocr-latest",
-                document={
-                    "type": "document_url",
-                    "document_url": f"data:application/pdf;base64,{base64_pdf}"
-                },
-                include_image_base64=True
-            )
+            print(f"Tamaño del PDF en base64: {len(base64_pdf)} caracteres")
+            
+            try:
+                pdf_response = self.mistral_client.ocr.process(
+                    model="mistral-ocr-latest",
+                    document={
+                        "type": "document_url",
+                        "document_url": f"data:application/pdf;base64,{base64_pdf}"
+                    },
+                    include_image_base64=True
+                )
+                print("✅ Respuesta de Mistral OCR recibida")
+            except Exception as api_error:
+                print(f"❌ Error en la llamada a Mistral OCR: {str(api_error)}")
+                print(f"📋 Tipo de error: {type(api_error).__name__}")
+                raise
             
             # Convertir respuesta a formato JSON
             response_dict = json.loads(pdf_response.model_dump_json())
+            print(f"📋 Estructura de respuesta: {list(response_dict.keys())}")
             
             # Extraer el contenido markdown
-            markdown_content = response_dict.get("content", "")
+            # La estructura de respuesta de Mistral OCR tiene el contenido en pages[0]['markdown']
+            pages = response_dict.get("pages", [])
+            if pages and len(pages) > 0:
+                markdown_content = pages[0].get("markdown", "")
+                print(f"✅ Contenido extraído de pages[0]['markdown']: {len(markdown_content)} caracteres")
+            else:
+                # Fallback al campo 'content' directo
+                markdown_content = response_dict.get("content", "")
+                print(f"⚠️  Usando fallback 'content': {len(markdown_content)} caracteres")
             
             if not markdown_content:
-                print("Error: No se pudo extraer contenido del PDF")
+                print("❌ Error: No se pudo extraer contenido del PDF")
+                print(f"📋 Claves disponibles en response_dict: {list(response_dict.keys())}")
+                print(f"📋 Número de páginas: {len(pages)}")
+                if pages:
+                    print(f"📋 Claves de pages[0]: {list(pages[0].keys())}")
                 return None
             
             print(f"Contenido extraído exitosamente: {len(markdown_content)} caracteres")
@@ -82,6 +103,7 @@ class MistralExtractionController:
             print(f"Error al extraer contenido del PDF: {str(e)}")
             return None
     
+    # Idea principal de todo el texto
     def generate_document_summary(self, markdown_content: str) -> str:
         try:
             # Limitar el contenido si es muy largo
@@ -115,6 +137,7 @@ class MistralExtractionController:
             print(f"Error generando resumen: {str(e)}")
             return "No se pudo generar resumen del documento."
     
+    # Chunking basado en headers
     def intelligent_chunking(self, markdown_content: str) -> List[Dict[str, Any]]:
         chunks = []
         
@@ -135,8 +158,15 @@ class MistralExtractionController:
         
         # Procesar cada chunk base
         for i, chunk in enumerate(base_chunks):
-            content = chunk.get("page_content", chunk) if isinstance(chunk, dict) else chunk
-            metadata = chunk.get("metadata", {}) if isinstance(chunk, dict) else {}
+            if hasattr(chunk, 'page_content'):
+                content = chunk.page_content
+                metadata = getattr(chunk, 'metadata', {})
+            elif isinstance(chunk, dict):
+                content = chunk.get("page_content", chunk)
+                metadata = chunk.get("metadata", {})
+            else:
+                content = chunk
+                metadata = {}
             
             # Si el chunk es muy grande, subdivirlo
             if len(content) > 1200:
@@ -163,6 +193,7 @@ class MistralExtractionController:
         
         return chunks
     
+    # Extraer elementos visuales de un chunk
     def extract_visual_elements(self, chunk_content: str) -> Dict[str, Any]:
         visual_info = {
             "has_images": False,
@@ -230,6 +261,7 @@ class MistralExtractionController:
         
         return visual_info
     
+    # Contextualizar un chunk especifico
     def contextualize_chunk(self, chunk: Dict[str, Any], document_summary: str, 
                           book_title: str, page_num: int) -> Dict[str, Any]:
         chunk_content = chunk["content"]
@@ -309,6 +341,7 @@ IMPORTANTE: Mantén el lenguaje técnico original y conceptos específicos.
             "metadata": enhanced_metadata
         }
     
+    # Funcion principal
     def process_document(self, pdf_path: str, book_title: str = None) -> Optional[List[Dict[str, Any]]]:
         if not book_title:
             book_title = os.path.basename(pdf_path)
