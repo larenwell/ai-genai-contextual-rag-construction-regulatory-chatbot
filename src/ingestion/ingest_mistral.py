@@ -26,13 +26,17 @@ class MistralExtractionController:
             chunk_overlap=200,
             separators=["\n\n", "\n", " ", ""]
         )
-    
+        
     def encode_pdf(self, pdf_path: str) -> str:
+        """Encode the pdf to base64."""
         try:
             with open(pdf_path, "rb") as pdf_file:
                 return base64.b64encode(pdf_file.read()).decode('utf-8')
-        except Exception as e:
-            print(f"Error codificando PDF: {str(e)}")
+        except FileNotFoundError:
+            print(f"Error: The file {pdf_path} was not found.")
+            return None
+        except Exception as e:  # Added general exception handling
+            print(f"Error: {str(e)}")
             return None
     
     def extract_content_mistral_ocr(self, pdf_path: str) -> Optional[Dict[str, str]]:
