@@ -27,6 +27,9 @@ class MistralExtractionController:
             separators=["\n\n", "\n", " ", ""]
         )
         
+        # Store page images for later use
+        self.page_images = {}
+        
     def encode_pdf(self, pdf_path: str) -> str:
         """Encode the pdf to base64."""
         try:
@@ -35,7 +38,7 @@ class MistralExtractionController:
         except FileNotFoundError:
             print(f"Error: The file {pdf_path} was not found.")
             return None
-        except Exception as e:  # Added general exception handling
+        except Exception as e:
             print(f"Error: {str(e)}")
             return None
     
@@ -64,7 +67,7 @@ class MistralExtractionController:
                         "type": "document_url",
                         "document_url": f"data:application/pdf;base64,{base64_pdf}"
                     },
-                    include_image_base64=True
+                    include_image_base64=True  # Important: This ensures images are included
                 )
                 print("✅ Respuesta de Mistral OCR recibida")
             except Exception as api_error:
@@ -76,19 +79,62 @@ class MistralExtractionController:
             response_dict = json.loads(pdf_response.model_dump_json())
             print(f"📋 Estructura de respuesta: {list(response_dict.keys())}")
             
-            # Extraer el contenido markdown de todas las páginas
+            # DEBUG:
+            print("🔍 DEBUG: Analyzing response structure...")
+            if "pages" in response_dict and response_dict["pages"]:
+                for i, page in enumerate(response_dict["pages"][:2]):  # Check first 2 pages
+                    print(f"📋 Página {i+1} keys: {list(page.keys())}")
+                    if "images" in page:
+                        print(f"📋 Página {i+1} images structure: {type(page['images'])} with {len(page['images'])} items")
+                        if page['images']:
+                            print(f"📋 First image keys: {list(page['images'][0].keys()) if isinstance(page['images'][0], dict) else 'Not a dict'}")
+            
+            # Extraer el contenido markdown de todas las páginas Y las imágenes
             pages = response_dict.get("pages", [])
             print(f"📋 Número total de páginas detectadas: {len(pages)}")
             
+            # Store page images for later use in chunking
+            self.page_images = {}
+            
             if pages and len(pages) > 0:
-                # Concatenar contenido de todas las páginas
+                # Concatenar contenido de todas las páginas y extraer imágenes
                 markdown_content = ""
                 for i, page in enumerate(pages):
                     page_content = page.get("markdown", "")
                     markdown_content += f"\n\n--- PÁGINA {i+1} ---\n\n{page_content}"
-                    print(f"✅ Página {i+1}: {len(page_content)} caracteres")
+                    
+                    # Extract images from this page - be more flexible with the structure
+                    page_images = []
+                    
+                    # Try different possible locations for images
+                    if "images" in page and page["images"]:
+                        page_images = page["images"]
+                    elif "image_base64" in page and page["image_base64"]:
+                        # Sometimes images might be in a different field
+                        page_images = [page["image_base64"]] if isinstance(page["image_base64"], str) else page["image_base64"]
+                    elif "base64_images" in page and page["base64_images"]:
+                        page_images = page["base64_images"]
+                    
+                    # Store images if found
+                    if page_images:
+                        self.page_images[i+1] = page_images
+                        print(f"✅ Página {i+1}: {len(page_content)} caracteres, {len(page_images)} imágenes almacenadas")
+                        
+                        # DEBUG: Check image format
+                        if isinstance(page_images[0], dict):
+                            print(f"🔍 Imagen como dict con keys: {list(page_images[0].keys())}")
+                        elif isinstance(page_images[0], str):
+                            print(f"🔍 Imagen como string de {len(page_images[0])} caracteres")
+                    else:
+                        print(f"✅ Página {i+1}: {len(page_content)} caracteres, sin imágenes")
                 
                 print(f"✅ Contenido total extraído: {len(markdown_content)} caracteres")
+                print(f"✅ Total de páginas con imágenes: {len(self.page_images)}")
+                
+                # DEBUG:
+                for page_num, images in self.page_images.items():
+                    print(f"🔍 Página {page_num}: {len(images)} imágenes almacenadas")
+                    
             else:
                 # Fallback al campo 'content' directo
                 markdown_content = response_dict.get("content", "")
@@ -107,14 +153,63 @@ class MistralExtractionController:
             return {
                 "markdown_content": markdown_content,
                 "response_data": response_dict,
-                "original_filename": os.path.basename(pdf_path)
+                "original_filename": os.path.basename(pdf_path),
+                "page_images": self.page_images
             }
                 
         except Exception as e:
             print(f"Error al extraer contenido del PDF: {str(e)}")
             return None
     
-    # Idea principal de todo el texto
+    def extract_images_from_chunk(self, chunk_content: str, page_num: int) -> List[str]:
+        chunk_images = []
+        
+        # Get images from the page this chunk belongs to
+        page_images = self.page_images.get(page_num, [])
+        
+        if not page_images:
+            return chunk_images
+        
+        # Strategy 1: If chunk mentions figures/images specifically, include all page images
+        image_references = re.findall(
+            r'(figura\s*\d+|imagen\s*\d+|gráfico\s*\d+|diagrama\s*\d+|tabla\s*\d+)', 
+            chunk_content, 
+            re.IGNORECASE
+        )
+        
+        if image_references:
+            # Include all images from this page if chunk references figures
+            for img in page_images:
+                if isinstance(img, dict) and 'image_base64' in img:
+                    chunk_images.append(img['image_base64'])
+                elif isinstance(img, str):
+                    chunk_images.append(img)
+            print(f"   Chunk con referencias a imágenes: {len(chunk_images)} imágenes incluidas")
+            return chunk_images
+        
+        # Strategy 2: Include images based on content heuristics
+        # If chunk has technical content, mathematical formulas, or structured data
+        has_technical_content = any([
+            re.search(r'\$.*?\$', chunk_content),  # LaTeX formulas
+            re.search(r'\|.*?\|', chunk_content),  # Tables
+            len(re.findall(r'\b\d+\.?\d*\b', chunk_content)) > 5,  # Many numbers
+            any(keyword in chunk_content.lower() for keyword in [
+                'resultado', 'análisis', 'gráfico', 'datos', 'medición', 
+                'experimento', 'método', 'proceso', 'sistema'
+            ])
+        ])
+        
+        if has_technical_content and page_images:
+            # Include first image from page for technical content
+            img = page_images[0]
+            if isinstance(img, dict) and 'image_base64' in img:
+                chunk_images.append(img['image_base64'])
+                print(f"   Chunk técnico: 1 imagen incluida")
+            elif isinstance(img, str):
+                chunk_images.append(img)
+        
+        return chunk_images
+    
     def generate_document_summary(self, markdown_content: str) -> str:
         try:
             # Limitar el contenido si es muy largo
@@ -148,7 +243,6 @@ class MistralExtractionController:
             print(f"Error generando resumen: {str(e)}")
             return "No se pudo generar resumen del documento."
     
-    # Chunking basado en headers
     def intelligent_chunking(self, markdown_content: str) -> List[Dict[str, Any]]:
         chunks = []
         
@@ -179,6 +273,10 @@ class MistralExtractionController:
                 content = chunk
                 metadata = {}
             
+            # Extract page number from content (assuming "--- PÁGINA X ---" format)
+            page_match = re.search(r'--- PÁGINA (\d+) ---', content)
+            page_num = int(page_match.group(1)) if page_match else 1
+            
             # Si el chunk es muy grande, subdivirlo
             if len(content) > 1200:
                 sub_chunks = self.char_splitter.split_text(content)
@@ -189,7 +287,8 @@ class MistralExtractionController:
                             **metadata,
                             "chunk_id": f"{i}_{j}",
                             "chunk_type": "text_subdivision",
-                            "parent_chunk": i
+                            "parent_chunk": i,
+                            "page_number": page_num
                         }
                     })
             else:
@@ -198,23 +297,19 @@ class MistralExtractionController:
                     "metadata": {
                         **metadata,
                         "chunk_id": str(i),
-                        "chunk_type": "structured_section" if metadata else "full_text"
+                        "chunk_type": "structured_section" if metadata else "full_text",
+                        "page_number": page_num
                     }
                 })
         
         return chunks
     
-    # Extraer elementos visuales de un chunk
     def extract_visual_elements(self, chunk_content: str) -> Dict[str, Any]:
         visual_info = {
             "has_images": False,
             "has_tables": False,
             "has_formulas": False,
-            "has_lists": False,
-            "image_descriptions": [],
-            "table_count": 0,
-            "formula_count": 0,
-            "list_count": 0
+            "has_lists": False
         }
         
         # Detectar imágenes
@@ -229,7 +324,6 @@ class MistralExtractionController:
             matches = re.findall(pattern, chunk_content, re.IGNORECASE)
             if matches:
                 visual_info["has_images"] = True
-                visual_info["image_descriptions"].extend(matches)
         
         # Detectar tablas
         table_patterns = [
@@ -242,7 +336,6 @@ class MistralExtractionController:
             matches = re.findall(pattern, chunk_content, re.IGNORECASE | re.MULTILINE)
             if matches:
                 visual_info["has_tables"] = True
-                visual_info["table_count"] += len(matches)
         
         # Detectar fórmulas
         formula_patterns = [
@@ -256,7 +349,6 @@ class MistralExtractionController:
             matches = re.findall(pattern, chunk_content, re.DOTALL)
             if matches:
                 visual_info["has_formulas"] = True
-                visual_info["formula_count"] += len(matches)
         
         # Detectar listas
         list_patterns = [
@@ -268,26 +360,35 @@ class MistralExtractionController:
             matches = re.findall(pattern, chunk_content, re.MULTILINE)
             if matches:
                 visual_info["has_lists"] = True
-                visual_info["list_count"] += len(matches)
         
         return visual_info
     
-    # Contextualizar un chunk especifico
     def contextualize_chunk(self, chunk: Dict[str, Any], document_summary: str, 
-                          book_title: str, page_num: int) -> Dict[str, Any]:
+                          book_title: str, page_num: int = None) -> Dict[str, Any]:
         chunk_content = chunk["content"]
+        
+        # Use page_num from chunk metadata if not provided
+        if page_num is None:
+            page_num = chunk.get("metadata", {}).get("page_number", 1)
+        
         visual_info = self.extract_visual_elements(chunk_content)
+        
+        # Extract relevant images for this chunk
+        chunk_images = self.extract_images_from_chunk(chunk_content, page_num)
+        print(f"Chunk con imágenes: {len(chunk_images)} imágenes incluidas")
         
         # Crear contexto visual
         visual_context = []
         if visual_info["has_images"]:
-            visual_context.append(f"Contiene {len(visual_info['image_descriptions'])} imágenes/figuras")
+            visual_context.append(f"Contiene referencias a imágenes/figuras")
         if visual_info["has_tables"]:
-            visual_context.append(f"Contiene {visual_info['table_count']} tablas")
+            visual_context.append(f"Contiene tablas")
         if visual_info["has_formulas"]:
-            visual_context.append(f"Contiene {visual_info['formula_count']} fórmulas")
+            visual_context.append(f"Contiene fórmulas")
         if visual_info["has_lists"]:
-            visual_context.append(f"Contiene {visual_info['list_count']} listas")
+            visual_context.append(f"Contiene listas")
+        if chunk_images:
+            visual_context.append(f"Incluye {len(chunk_images)} imágenes asociadas")
         
         visual_summary = "; ".join(visual_context) if visual_context else "Solo texto"
         
@@ -317,7 +418,7 @@ IMPORTANTE: Mantén el lenguaje técnico original y conceptos específicos.
         
         try:
             context_response = self.mistral_client.chat.complete(
-                model="mistral-small-latest",  # Corregido el modelo
+                model="mistral-small-latest",
                 messages=[
                     {
                         "role": "system",
@@ -336,14 +437,13 @@ IMPORTANTE: Mantén el lenguaje técnico original y conceptos específicos.
             print(f"Error contextualizando chunk {chunk.get('metadata', {}).get('chunk_id', 'unknown')}: {str(e)}")
             contextualized_content = chunk_content
         
-        # Metadata enriquecida
+        # Enhanced metadata with images
         enhanced_metadata = {
             **chunk.get("metadata", {}),
             "book_title": book_title,
             "page_number": page_num,
-            "original_content": chunk_content,
-            "contextualized_content": contextualized_content,
-            "visual_summary": visual_summary,
+            # "images": chunk_images,  # TODO: Add images to metadata
+            "has_associated_images": len(chunk_images) > 0,
             **visual_info
         }
         
@@ -352,7 +452,6 @@ IMPORTANTE: Mantén el lenguaje técnico original y conceptos específicos.
             "metadata": enhanced_metadata
         }
     
-    # Funcion principal
     def process_document(self, pdf_path: str, book_title: str = None) -> Optional[List[Dict[str, Any]]]:
         if not book_title:
             book_title = os.path.basename(pdf_path)
@@ -380,9 +479,14 @@ IMPORTANTE: Mantén el lenguaje técnico original y conceptos específicos.
         for i, chunk in enumerate(chunks):
             print(f"   Procesando chunk {i+1}/{len(chunks)}")
             enhanced_chunk = self.contextualize_chunk(
-                chunk, document_summary, book_title, 1
+                chunk, document_summary, book_title
             )
             enhanced_chunks.append(enhanced_chunk)
         
+        # Summary of images included
+        total_chunks_with_images = sum(1 for chunk in enhanced_chunks if chunk["metadata"]["has_associated_images"])
+        
         print(f"Proceso completado: {len(enhanced_chunks)} chunks contextualizados")
+        print(f"Chunks con imágenes: {total_chunks_with_images}/{len(enhanced_chunks)}")
+        
         return enhanced_chunks

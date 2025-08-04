@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from embeddings.embedding_funcs import EmbeddingController
 from ingestion.ingest_mistral import MistralExtractionController
 
-PDF_PATH = "data/Guia-Tecnica-001-OS-DSR-UTH.pdf"
+PDF_FOLDER_PATH = "../data"
 
 project_root = Path(__file__).parent.parent
 sys.path.append(str(project_root))
@@ -19,12 +19,12 @@ PINECONE_INDEX = os.getenv("PINECONE_INDEX")
 
 OUTPUT_DIR = Path("./output")
 
-def save_results(enhanced_chunks, output_dir):
+def save_results(enhanced_chunks, output_dir, pdf_name):
     """Guarda los resultados en archivos JSON para inspección"""
     output_dir.mkdir(exist_ok=True)
     
     # Guardar chunks completos
-    with open(output_dir / "enhanced_chunks.json", "w", encoding="utf-8") as f:
+    with open(output_dir / f"enhanced_chunks_v2_{pdf_name}.json", "w", encoding="utf-8") as f:
         json.dump(enhanced_chunks, f, indent=2, ensure_ascii=False)
     
     # Guardar solo contenido contextualizado para revisión
@@ -48,75 +48,23 @@ def save_results(enhanced_chunks, output_dir):
     print(f"📁 Resultados guardados en: {output_dir}")
 
 
-# def test_ingestion_process():
-#     mistral_controller = MistralExtractionController(api_key=MISTRAL_API_KEY)
-#     embedding_controller = EmbeddingController(model_name="nomic-embed-text", pinecone_api_key=PINECONE_API_KEY, pinecone_index=PINECONE_INDEX)
-
-#     print("Procesando documento...")
-
-#     # 1 Paso: Extraccion con Mistral OCR
-#     print("1. Extraccion con Mistral OCR...")
-#     extraction_result = mistral_controller.extract_content_mistral_ocr(PDF_PATH)
-#     if not extraction_result:
-#         print("Error en la extracción. Abortando.")
-#         return
-
-#     # 2 Paso: Generacion de resumen
-#     print("2. Generando resumen general...")
-#     document_summary = mistral_controller.generate_document_summary(extraction_result["markdown_content"])
-#     print(f"Resumen generado: {document_summary}")
-
-
-#     # 3. Chunking inteligente
-#     print("3. Realizando chunking inteligente...")
-#     chunks = mistral_controller.intelligent_chunking(extraction_result["markdown_content"])
-#     print(f"Chunking realizado con éxito. {len(chunks)} chunks generados.")
-
-#     # 4. Contextualizar chunks
-#     print("4. Contextualizando chunks...")
-#     enhanced_chunks = []
-#     for chunk in chunks:
-#         enhanced_chunk = mistral_controller.contextualize_chunk(
-#             chunk, document_summary, "Guia-Tecnica-001-OS-DSR-UTH", 1
-#         )
-#         enhanced_chunks.append(enhanced_chunk)
-#     print(f"Contextualizacion realizada con éxito. {len(enhanced_chunks)} chunks contextualizados.")
-
-#     print("\nEnhanced Chunks: ")
-#     for chunk in enhanced_chunks[:5]:
-#         print(chunk)
-
-#     # 5. Generacion de embeddings
-#     print("5. Generando embeddings...")
-#     embeddings = [embedding_controller.generate_embeddings(chunk["content"]) for chunk in enhanced_chunks]
-#     print(f"Embeddings generados con éxito. {len(embeddings)} embeddings generados.")
-
-#     # # 6. Almacenamiento en Pinecone
-#     # print("6. Almacenando en Pinecone...")
-#     # embedding_controller.store_embeddings(embeddings, enhanced_chunks)
-#     # print("Almacenamiento en Pinecone completado con éxito.")
-
-
-def test_full_mistral_pipeline():
-    # Verificar que el archivo existe
-    if not os.path.exists(PDF_PATH):
-        print(f"❌ Error: El archivo {PDF_PATH} no existe")
-        print(f"📁 Directorio actual: {os.getcwd()}")
-        print(f"📁 Archivos en data/: {os.listdir('data') if os.path.exists('data') else 'No existe directorio data'}")
+def test_full_mistral_pipeline(pdf_path):
+    # Verificaciones previas
+    if not os.path.exists(pdf_path):
+        print(f"Error: El archivo {pdf_path} no existe")
         return
 
-    # Verificar API keys
     if not MISTRAL_API_KEY:
-        print("❌ Error: MISTRAL_API_KEY no está configurada")
+        print("Error: MISTRAL_API_KEY no está configurada")
         return
     
     if not PINECONE_API_KEY:
-        print("❌ Error: PINECONE_API_KEY no está configurada")
+        print("Error: PINECONE_API_KEY no está configurada")
         return
 
-    print(f"✅ Archivo encontrado: {PDF_PATH}")
-    print(f"✅ MISTRAL_API_KEY configurada: {'Sí' if MISTRAL_API_KEY else 'No'}")
-    print(f"✅ PINECONE_API_KEY configurada: {'Sí' if PINECONE_API_KEY else 'No'}")
+    print(f"Archivo encontrado: {pdf_path}")
+    print(f"MISTRAL_API_KEY configurada: {'Sí' if MISTRAL_API_KEY else 'No'}")
+    print(f"PINECONE_API_KEY configurada: {'Sí' if PINECONE_API_KEY else 'No'}")
 
     mistral_controller = MistralExtractionController(api_key=MISTRAL_API_KEY)
     embedding_controller = EmbeddingController(
@@ -126,23 +74,22 @@ def test_full_mistral_pipeline():
     )
 
     try:
-        # Procesar documento completo
-        print(f"\n🔄 Iniciando procesamiento de: {PDF_PATH}")
+        print(f"\n Iniciando procesamiento de: {pdf_path}")
         enhanced_chunks = mistral_controller.process_document(
-            PDF_PATH, 
-            book_title="Guía Técnica 001-OS-DSR-UTH"
+            pdf_path, 
+            book_title=os.path.basename(pdf_path)
         )
 
         if enhanced_chunks is None:
-            print("❌ Error: process_document retornó None. Revisa los logs anteriores.")
+            print("Error: process_document retornó None. Revisa los logs anteriores.")
             return
 
         if len(enhanced_chunks) == 0:
-            print("❌ Error: No se generaron chunks. Revisa los logs anteriores.")
+            print("Error: No se generaron chunks. Revisa los logs anteriores.")
             return
 
-        print(f"✅ Procesamiento completado: {len(enhanced_chunks)} chunks generados")
-        save_results(enhanced_chunks, OUTPUT_DIR)
+        print(f"Procesamiento completado: {len(enhanced_chunks)} chunks generados")
+        save_results(enhanced_chunks, OUTPUT_DIR, os.path.basename(pdf_path))
 
         print("\n=== EJEMPLO DE CHUNK CONTEXTUALIZADO ===")
         example_chunk = enhanced_chunks[0]
@@ -159,19 +106,26 @@ def test_full_mistral_pipeline():
             embedding = embedding_controller.generate_embeddings(chunk["content"])
             embeddings.append(embedding)
 
-        print(f"✅ Embeddings generados con éxito. {len(embeddings)} embeddings generados.")
+        print(f"Embeddings generados con éxito. {len(embeddings)} embeddings generados.")
 
         # Almacenar embeddings
         embedding_controller.store_embeddings(embeddings, enhanced_chunks)
         print("Almacenamiento en Pinecone completado con éxito.")
 
     except Exception as e:
-        print(f"❌ Error al procesar el documento: {str(e)}")
+        print(f"Error al procesar el documento: {str(e)}")
         import traceback
         print(f"📋 Traceback completo:")
         traceback.print_exc()
 
+# === Operar el pipeline en todos los PDFs de una carpeta ===
+def operate_in_folder(pdf_folder_path):
+    for pdf_file in os.listdir(pdf_folder_path):
+        if pdf_file.endswith(".pdf"):
+            pdf_path = os.path.join(pdf_folder_path, pdf_file)
+            test_full_mistral_pipeline(pdf_path)
+
 
 if __name__ == "__main__":
-    test_full_mistral_pipeline()
+    operate_in_folder(PDF_FOLDER_PATH)
     
