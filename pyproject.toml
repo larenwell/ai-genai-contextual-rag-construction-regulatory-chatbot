@@ -29,6 +29,10 @@ dependencies = [
   "mistralai",
   "openpyxl",
   "pypdf2",
+  "ragas",
+  "groq",
+  "asyncpg",
+  "boto3"
 ]
 
 [tool.uv]

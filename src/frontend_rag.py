@@ -33,7 +33,7 @@ def format_sources_for_display(context_results):
         metadata = match.get('metadata', {})
         score = match.get('score', 0)
         
-        title = metadata.get('title', 'Sin título')
+        title = metadata.get('book_title', 'Sin título')
         page = int(metadata.get('page_number', 0)) if metadata.get('page_number') else 'N/A'
         
         sources_text += f"**Fuente {i}:**\n"
@@ -59,12 +59,13 @@ async def main(message: cl.Message):
     history = cl.user_session.get("history")
     history.append({"role": "user", "content": message.content})
 
-    # 2) Traducir la pregunta al inglés
-    message.content = translate_text(message.content)
 
     # 3) Extraer contexto del Pinecone
     embed_question = embedding_admin.generate_embeddings(message.content)
-    context = embedding_admin.load_and_query_pinecone(embed_question, top_k=5)
+    context_response = embedding_admin.load_and_query_pinecone(embed_question, top_k=5)
+    context_texts = [match['metadata']['text'] for match in context_response['matches']]
+    context = "\n".join(context_texts)
+
     print(f"Context: {context}")
 
     # 4) pipeline RAG
@@ -75,8 +76,8 @@ async def main(message: cl.Message):
     await main_message.send()
     
     # 5.5) incluir fuentes
-    if context:
-        sources_content = format_sources_for_display(context)
+    if context_response:
+        sources_content = format_sources_for_display(context_response)
         await cl.Message(
             content=sources_content,
             author="📚 Fuentes"

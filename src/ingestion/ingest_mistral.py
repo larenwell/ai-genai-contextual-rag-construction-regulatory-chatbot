@@ -79,16 +79,6 @@ class MistralExtractionController:
             response_dict = json.loads(pdf_response.model_dump_json())
             print(f"📋 Estructura de respuesta: {list(response_dict.keys())}")
             
-            # DEBUG:
-            print("🔍 DEBUG: Analyzing response structure...")
-            if "pages" in response_dict and response_dict["pages"]:
-                for i, page in enumerate(response_dict["pages"][:2]):  # Check first 2 pages
-                    print(f"📋 Página {i+1} keys: {list(page.keys())}")
-                    if "images" in page:
-                        print(f"📋 Página {i+1} images structure: {type(page['images'])} with {len(page['images'])} items")
-                        if page['images']:
-                            print(f"📋 First image keys: {list(page['images'][0].keys()) if isinstance(page['images'][0], dict) else 'Not a dict'}")
-            
             # Extraer el contenido markdown de todas las páginas Y las imágenes
             pages = response_dict.get("pages", [])
             print(f"📋 Número total de páginas detectadas: {len(pages)}")
@@ -101,7 +91,7 @@ class MistralExtractionController:
                 markdown_content = ""
                 for i, page in enumerate(pages):
                     page_content = page.get("markdown", "")
-                    markdown_content += f"\n\n--- PÁGINA {i+1} ---\n\n{page_content}"
+                    markdown_content += f"\n\n--- Page {i+1} ---\n\n{page_content}"
                     
                     # Extract images from this page - be more flexible with the structure
                     page_images = []
@@ -119,24 +109,16 @@ class MistralExtractionController:
                     if page_images:
                         self.page_images[i+1] = page_images
                         print(f"✅ Página {i+1}: {len(page_content)} caracteres, {len(page_images)} imágenes almacenadas")
-                        
-                        # DEBUG: Check image format
-                        if isinstance(page_images[0], dict):
-                            print(f"🔍 Imagen como dict con keys: {list(page_images[0].keys())}")
-                        elif isinstance(page_images[0], str):
-                            print(f"🔍 Imagen como string de {len(page_images[0])} caracteres")
                     else:
                         print(f"✅ Página {i+1}: {len(page_content)} caracteres, sin imágenes")
                 
                 print(f"✅ Contenido total extraído: {len(markdown_content)} caracteres")
                 print(f"✅ Total de páginas con imágenes: {len(self.page_images)}")
                 
-                # DEBUG:
                 for page_num, images in self.page_images.items():
                     print(f"🔍 Página {page_num}: {len(images)} imágenes almacenadas")
                     
             else:
-                # Fallback al campo 'content' directo
                 markdown_content = response_dict.get("content", "")
                 print(f"⚠️  Usando fallback 'content': {len(markdown_content)} caracteres")
             
@@ -247,60 +229,111 @@ class MistralExtractionController:
         chunks = []
         
         try:
-            # Intentar chunking por headers primero
-            header_chunks = self.markdown_splitter.split_text(markdown_content)
+            # First split by page boundaries
+            page_sections = re.split(r'(--- Page \d+ ---)', markdown_content)
             
-            if len(header_chunks) > 1:
-                print(f"Usando chunking por headers: {len(header_chunks)} chunks")
-                base_chunks = header_chunks
-            else:
-                print("No se encontraron headers, usando chunking por caracteres")
-                base_chunks = [{"page_content": markdown_content, "metadata": {}}]
+            # Process pages and their content
+            current_page_num = 1
+            current_headers = {}
+            
+            # The first item is content before the first page marker
+            if page_sections and not page_sections[0].strip():
+                page_sections = page_sections[1:]
+            
+            i = 0
+            while i < len(page_sections):
+                section = page_sections[i].strip()
+                
+                # If this is a page marker, update current page number
+                page_match = re.match(r'--- Page (\d+) ---', section)
+                if page_match:
+                    current_page_num = int(page_match.group(1))
+                    i += 1
+                    if i >= len(page_sections):
+                        break
+                    section = page_sections[i].strip()
+                
+                if not section:
+                    i += 1
+                    continue
+                
+                # Process this page's content
+                try:
+                    # Update headers from this page
+                    header_lines = re.findall(r'^(#+)\s+(.*?)$', section, re.MULTILINE)
+                    for level, title in header_lines:
+                        level_key = f"Header {len(level)}"
+                        current_headers[level_key] = title.strip()
+                    
+                    # Split by headers first
+                    header_chunks = self.markdown_splitter.split_text(section)
+                    
+                    if header_chunks:
+                        for chunk in header_chunks:
+                            if hasattr(chunk, 'page_content'):
+                                content = chunk.page_content
+                                metadata = getattr(chunk, 'metadata', {})
+                            else:
+                                content = str(chunk)
+                                metadata = {}
+                            
+                            # Update metadata with current headers and page number
+                            metadata.update({
+                                **current_headers,
+                                "page_number": current_page_num,
+                                "chunk_id": f"{len(chunks)}_0",
+                                "chunk_type": "structured_section"
+                            })
+                            
+                            # If chunk is too large, split it further
+                            if len(content) > 1200:
+                                sub_chunks = self.char_splitter.split_text(content)
+                                for j, sub_chunk in enumerate(sub_chunks):
+                                    sub_metadata = metadata.copy()
+                                    sub_metadata.update({
+                                        "chunk_id": f"{len(chunks)}_{j}",
+                                        "chunk_type": "text_subdivision",
+                                        "parent_chunk": len(chunks)
+                                    })
+                                    chunks.append({
+                                        "content": sub_chunk,
+                                        "metadata": sub_metadata
+                                    })
+                            else:
+                                chunks.append({
+                                    "content": content,
+                                    "metadata": metadata
+                                })
+                    
+                except Exception as e:
+                    print(f"Error processing page {current_page_num}: {str(e)}")
+                    # Fallback to character-based splitting if header splitting fails
+                    sub_chunks = self.char_splitter.split_text(section)
+                    for j, sub_chunk in enumerate(sub_chunks):
+                        chunks.append({
+                            "content": sub_chunk,
+                            "metadata": {
+                                **current_headers,
+                                "page_number": current_page_num,
+                                "chunk_id": f"{len(chunks)}_{j}",
+                                "chunk_type": "text_subdivision"
+                            }
+                        })
+                
+                i += 1
                 
         except Exception as e:
-            print(f"Error en chunking por headers: {e}")
-            base_chunks = [{"page_content": markdown_content, "metadata": {}}]
-        
-        # Procesar cada chunk base
-        for i, chunk in enumerate(base_chunks):
-            if hasattr(chunk, 'page_content'):
-                content = chunk.page_content
-                metadata = getattr(chunk, 'metadata', {})
-            elif isinstance(chunk, dict):
-                content = chunk.get("page_content", chunk)
-                metadata = chunk.get("metadata", {})
-            else:
-                content = chunk
-                metadata = {}
-            
-            # Extract page number from content (assuming "--- PÁGINA X ---" format)
-            page_match = re.search(r'--- PÁGINA (\d+) ---', content)
-            page_num = int(page_match.group(1)) if page_match else 1
-            
-            # Si el chunk es muy grande, subdivirlo
-            if len(content) > 1200:
-                sub_chunks = self.char_splitter.split_text(content)
-                for j, sub_chunk in enumerate(sub_chunks):
-                    chunks.append({
-                        "content": sub_chunk,
-                        "metadata": {
-                            **metadata,
-                            "chunk_id": f"{i}_{j}",
-                            "chunk_type": "text_subdivision",
-                            "parent_chunk": i,
-                            "page_number": page_num
-                        }
-                    })
-            else:
-                chunks.append({
-                    "content": content,
-                    "metadata": {
-                        **metadata,
-                        "chunk_id": str(i),
-                        "chunk_type": "structured_section" if metadata else "full_text",
-                        "page_number": page_num
-                    }
-                })
+            print(f"Error in intelligent_chunking: {str(e)}")
+            # Fallback to simple character splitting
+            sub_chunks = self.char_splitter.split_text(markdown_content)
+            chunks = [{
+                "content": chunk,
+                "metadata": {
+                    "chunk_id": str(i),
+                    "chunk_type": "full_text",
+                    "page_number": 1
+                }
+            } for i, chunk in enumerate(sub_chunks)]
         
         return chunks
     
