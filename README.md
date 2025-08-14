@@ -1,61 +1,62 @@
-# Enhanced Mistral OCR Contextual RAG Assistant
+# AI Contextual RAG Assistant - Normativa Sincro
 
 ## Project Description
 
-This project implements an advanced **Contextual Retrieval-Augmented Generation (RAG)** system that leverages **Mistral OCR** to process both text and visual content from regulatory documents. The system goes beyond traditional RAG by incorporating AI-enhanced document understanding, visual element analysis, and intelligent annotations to provide superior search relevance and contextual responses.
+This project implements a **Contextual Retrieval-Augmented Generation (RAG)** system designed for regulatory compliance assistance. The system features a **Spanish user interface** with **English knowledge base storage**, providing multilingual support while maintaining optimal search performance.
 
-**Key Innovation**: This implementation uses **Mistral OCR** for multimodal document processing, combining text extraction with visual understanding (diagrams, charts, tables, formulas) and contextual enhancement using AI to create superior embeddings for regulatory compliance assistance.
+**Key Innovation**: This implementation uses a **hybrid language approach** where documents are processed and stored in English for optimal search, while user interactions occur entirely in Spanish, with intelligent translation handling throughout the workflow.
 
 ## Scope
 
 The system encompasses the following key areas:
 
-- **Multimodal Document Processing**: PDF extraction with Mistral OCR for text, images, tables, and diagrams
-- **Visual Element Understanding**: AI-powered analysis of charts, formulas, and technical diagrams
-- **Contextual Document Processing**: AI-enhanced contextual understanding using Mistral models
-- **Intelligent Annotation System**: Automatic detection and tagging of requirements, warnings, and important notes
-- **Batch Processing**: Efficient processing of multiple documents with progress tracking
-- **Multilingual Support**: Spanish user interface with English document processing
-- **Contextual Vector Search**: Semantic similarity search using contextually enhanced embeddings
-- **AI-Powered Responses**: Contextual answers using advanced LLM models
-- **Quality Assurance**: Comprehensive evaluation framework with visual content assessment
+- **Multilingual RAG System**: Spanish UI with English knowledge base for optimal search
+- **Document Processing**: PDF extraction and analysis using Mistral OCR
+- **Intelligent Translation**: Automatic language detection and translation between Spanish and English
+- **Vector Search**: Semantic similarity search using Pinecone vector database
+- **AI-Powered Responses**: Contextual answers using Groq LLM models
+- **Professional UI**: Clean, modern interface built with Chainlit
+- **REST API**: FastAPI backend for programmatic access
+- **Quality Assurance**: Comprehensive evaluation framework
 
 ## Objectives
 
 ### Primary Objectives
-1. **Multimodal Regulatory Compliance**: Process text and visual content for comprehensive regulatory assistance
-2. **Visual Understanding**: Extract and understand diagrams, charts, tables, and formulas
-3. **Contextual Retrieval**: Implement AI-enhanced document chunking with visual context
-4. **Intelligent Annotations**: Automatically detect and highlight regulatory requirements and important information
-5. **Batch Processing**: Efficient processing of large document collections
-6. **Professional Communication**: Maintain formal, precise, and professional tone
+1. **Multilingual Regulatory Compliance**: Spanish interface with English document processing
+2. **Intelligent Language Handling**: Automatic translation for optimized search
+3. **Contextual Retrieval**: AI-enhanced document chunking with metadata preservation
+4. **Professional Communication**: Maintain formal, precise, and professional tone
+5. **Scalable Architecture**: Modular design for easy maintenance and extension
 
 ### Technical Objectives
-1. **Mistral OCR Integration**: Seamless integration with Mistral's OCR capabilities
-2. **Visual Context Preservation**: Maintain visual context in document chunks
-3. **Scalable Architecture**: Modular design for easy maintenance and extension
-4. **Performance Optimization**: Efficient multimodal document processing
-5. **Quality Assurance**: Comprehensive evaluation framework for multimodal content
+1. **Language Workflow**: Spanish input → English search → Spanish output
+2. **Vector Search Optimization**: Efficient semantic search with English embeddings
+3. **Metadata Preservation**: Visual elements, tables, and contextual information
+4. **Performance Optimization**: Fast response times and efficient processing
+5. **Quality Assurance**: Comprehensive evaluation framework
 
 ## Implementation Guide
 
 ### Prerequisites
 
 - Python 3.12 or higher
-- Mistral AI API key with OCR access
-- Vector database (Pinecone, Qdrant, or similar)
-- Docker and Docker Compose (for local services)
+- Groq API key for LLM access
+- Pinecone API key for vector database
+- Mistral AI API key for OCR processing
+- Docker (optional, for local services)
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd rag-asistente-normativa
+   cd ai-contextual-rag-asistente-normativa-sincro
    ```
 
 2. **Install dependencies**
    ```bash
+   pip install -r requirements.txt
+   # or using uv
    uv sync
    ```
 
@@ -68,246 +69,298 @@ The system encompasses the following key areas:
 4. **Set up environment variables**
    Create a `.env` file in the project root:
    ```env
-   MISTRAL_API_KEY=your_mistral_api_key
+   GROQ_API_KEY=your_groq_api_key
    PINECONE_API_KEY=your_pinecone_api_key
    PINECONE_INDEX=your_pinecone_index_name
+   MISTRAL_API_KEY=your_mistral_api_key
    ```
 
 ### Project Structure
 
 ```
-rag-asistente-normativa/
+ai-contextual-rag-asistente-normativa-sincro/
 ├── src/
-│   ├── ingestion/
-│   │   ├── ingest_mistral.py              # Original Mistral OCR implementation
-│   │   ├── enhanced_mistral_ocr.py        # Enhanced OCR with visual understanding
-│   │   └── batch_processor.py             # Batch processing utilities
+│   ├── analysis/
+│   │   └── pdf_analyzer.py                 # PDF analysis utilities
+│   ├── config/
+│   │   ├── display_config.py               # UI display configuration
+│   │   └── prompt_config.py                # LLM prompt management
 │   ├── embeddings/
-│   │   └── embedding_funcs.py             # Vector embedding management
+│   │   └── embedding_funcs.py              # Vector embedding management
+│   ├── evaluation/
+│   │   ├── evaluation_ragas.py             # RAG evaluation framework
+│   │   ├── run_evaluation.py               # Evaluation execution
+│   │   └── sample_questions.json           # Test questions for evaluation
+│   ├── ingestion/
+│   │   └── ingest_mistral.py               # Mistral OCR document processing
 │   ├── llm/
-│   │   ├── context_llm.py                 # Contextual LLM processing
-│   │   └── groq_llm.py                    # Response generation
+│   │   └── groq_llm.py                     # Groq LLM integration
 │   ├── translation/
-│   │   └── translate.py                   # Text translation utilities
-│   └── rag_process.py                     # Main RAG processing logic
+│   │   └── translate.py                    # Text translation utilities
+│   ├── api_rag.py                          # FastAPI REST endpoint
+│   ├── frontend_rag.py                     # Chainlit web interface
+│   └── ingestion_manual_mistral.py         # Manual ingestion script
 ├── scripts/
-│   ├── run_batch_processing.py            # Batch processing script
-│   └── run_evaluation.sh                  # Evaluation execution script
-├── output/                                # Processing results and reports
-├── docker-compose.yml                     # Local service configuration
-└── pyproject.toml                         # Project dependencies
+│   ├── setup_pinecone_index.py             # Pinecone configuration
+│   └── setup_project_structure.py          # Project initialization
+├── tests/                                  # Test files
+├── output/                                 # Processing results and reports
+├── chainlit.md                             # Chainlit welcome screen and CSS
+└── pyproject.toml                          # Project dependencies
 ```
 
 ## Implementation Details
 
 ### Core Components
 
-#### 1. Enhanced Mistral OCR Processing (`src/ingestion/enhanced_mistral_ocr.py`)
-- **Multimodal Extraction**: Text, images, tables, diagrams, and formulas
-- **Visual Element Detection**: AI-powered identification of visual content
-- **Contextual Enhancement**: AI-enhanced chunks with visual context
-- **Annotation System**: Automatic detection of requirements, warnings, and important notes
-- **Batch Processing**: Efficient handling of multiple documents
+#### 1. Language Workflow System
+- **Spanish Input**: User questions in Spanish
+- **English Translation**: Automatic translation for KB search optimization
+- **English Context**: Retrieved from English knowledge base
+- **Spanish Output**: LLM responses in Spanish for user interface
 
-#### 2. Visual Element Understanding
-- **Image Analysis**: Captioning and description of diagrams and charts
-- **Table Processing**: Structure preservation and content extraction
-- **Formula Recognition**: Mathematical expression understanding
-- **Diagram Interpretation**: Technical diagram analysis and description
+#### 2. Document Processing (`src/ingestion/ingest_mistral.py`)
+- **PDF Extraction**: Text, images, tables, and visual elements
+- **Content Chunking**: Intelligent document segmentation
+- **Metadata Preservation**: Visual elements, page numbers, and context
+- **English Storage**: All content stored in English for optimal search
 
-#### 3. Intelligent Annotation System
-- **Requirement Detection**: Automatic identification of regulatory requirements
-- **Warning Recognition**: Detection of safety warnings and cautions
-- **Importance Scoring**: Priority-based annotation system
-- **Expert Notes**: Contextual annotations for enhanced understanding
+#### 3. Translation Module (`src/translation/translate.py`)
+- **Language Detection**: Automatic Spanish/English identification
+- **Bidirectional Translation**: Spanish ↔ English conversion
+- **Search Optimization**: English queries for English KB
+- **Response Localization**: Spanish output for Spanish UI
 
-#### 4. Batch Processing (`src/ingestion/batch_processor.py`)
-- **Concurrent Processing**: Controlled parallel document processing
-- **Progress Tracking**: Real-time processing status and metrics
-- **Error Handling**: Robust error recovery and reporting
-- **Result Management**: Organized output with detailed reports
+#### 4. Vector Search System (`src/embeddings/embedding_funcs.py`)
+- **Nomic Embeddings**: `nomic-embed-text` model for vector generation
+- **Pinecone Integration**: Vector database for similarity search
+- **Metadata Indexing**: Visual elements and contextual information
+- **Semantic Search**: Context-aware document retrieval
 
-#### 5. Contextual Vector Embedding System
-- **Multimodal Embeddings**: Text and visual content representation
-- **Context Preservation**: Visual context in embedding generation
-- **Annotation Integration**: Annotation-aware search capabilities
-- **Scalable Storage**: Efficient vector database management
+#### 5. LLM Integration (`src/llm/groq_llm.py`)
+- **Groq API**: `llama-3.3-70b-versatile` model
+- **Prompt Management**: Centralized prompt configuration
+- **Language Control**: Ensures Spanish responses
+- **Context Processing**: Handles English input, generates Spanish output
+
+#### 6. User Interface (`src/frontend_rag.py`)
+- **Chainlit Framework**: Modern chat interface
+- **Spanish Localization**: Complete Spanish UI
+- **Source Display**: Clean source attribution
+- **Responsive Design**: Professional and accessible interface
+
+#### 7. REST API (`src/api_rag.py`)
+- **FastAPI Backend**: Programmatic access to RAG system
+- **Language Workflow**: Same multilingual logic as frontend
+- **Error Handling**: Comprehensive error management
+- **Response Formatting**: Structured API responses
 
 ### Key Features
 
-#### Multimodal Processing
-- **Text + Visual**: Combined processing of text and visual content
-- **Context Preservation**: Visual context maintained in chunks
-- **Enhanced Search**: Visual elements improve search relevance
-- **Comprehensive Understanding**: Full document comprehension
+#### Multilingual Support
+- **Spanish Interface**: Complete user experience in Spanish
+- **English Knowledge Base**: Optimal search performance
+- **Automatic Translation**: Seamless language handling
+- **Consistent Experience**: Same workflow in both languages
 
-#### Intelligent Annotations
-- **Automatic Detection**: AI-powered annotation identification
-- **Priority System**: Critical, high, medium, low priority levels
-- **Expert Integration**: Support for manual expert annotations
-- **Search Enhancement**: Annotations improve retrieval accuracy
+#### Document Processing
+- **Visual Elements**: Images, tables, and diagrams preserved
+- **Metadata Rich**: Page numbers, chunk types, and context
+- **Intelligent Chunking**: Context-aware document segmentation
+- **Batch Processing**: Efficient handling of multiple documents
 
-#### Batch Processing
-- **Scalable**: Process hundreds of documents efficiently
-- **Concurrent**: Parallel processing with controlled concurrency
-- **Monitoring**: Real-time progress tracking and reporting
-- **Error Recovery**: Robust error handling and recovery
+#### Search and Retrieval
+- **Semantic Search**: Context-aware document retrieval
+- **Visual Context**: Visual elements enhance search relevance
+- **Source Attribution**: Clear document and page references
+- **Relevance Scoring**: Intelligent result ranking
 
-#### Visual Understanding
-- **Diagram Analysis**: Technical diagram interpretation
-- **Chart Recognition**: Data visualization understanding
-- **Table Processing**: Structured data extraction
-- **Formula Interpretation**: Mathematical expression analysis
+#### User Experience
+- **Professional UI**: Clean, modern interface design
+- **Responsive Design**: Works on all device sizes
+- **Source Display**: Clear attribution and references
+- **Error Handling**: Graceful error recovery
 
 ### Configuration
 
 #### Environment Variables
 ```env
-MISTRAL_API_KEY=your_mistral_api_key
+GROQ_API_KEY=your_groq_api_key
 PINECONE_API_KEY=your_pinecone_api_key
 PINECONE_INDEX=your_pinecone_index_name
+MISTRAL_API_KEY=your_mistral_api_key
 ```
 
 #### Model Configuration
-- **OCR Model**: `mistral-ocr-latest`
-- **Contextual LLM**: `mistral-large-latest`
+- **LLM Model**: `llama-3.3-70b-versatile` (Groq)
 - **Embedding Model**: `nomic-embed-text` (768 dimensions)
-- **Chunk Size**: 1200 characters
-- **Chunk Overlap**: 300 characters
-- **Max Concurrent**: 3 documents (configurable)
+- **OCR Model**: Mistral OCR for document processing
+- **Chunk Size**: Configurable text segmentation
+- **Vector Database**: Pinecone for similarity search
 
 ### Usage
 
-#### Single Document Processing
-```python
-from src.ingestion.enhanced_mistral_ocr import EnhancedMistralOCRController
-
-controller = EnhancedMistralOCRController(api_key="your_mistral_api_key")
-enhanced_chunks = await controller.process_single_document(
-    pdf_path="document.pdf",
-    book_title="Technical Guide"
-)
-```
-
-#### Batch Processing
-```python
-from src.ingestion.batch_processor import BatchProcessor
-
-processor = BatchProcessor(api_key="your_mistral_api_key")
-results = await processor.process_documents_batch(
-    pdf_paths=["doc1.pdf", "doc2.pdf", "doc3.pdf"],
-    book_titles=["Guide 1", "Guide 2", "Guide 3"],
-    max_concurrent=2
-)
-```
-
-#### Running Batch Processing Script
+#### Web Interface
 ```bash
-python scripts/run_batch_processing.py
+# Start the Chainlit interface
+python -m chainlit run src/frontend_rag.py
 ```
 
-### Visual Processing Workflow
-
-#### 1. Document Analysis
-```python
-# Extract content with visual elements
-extraction_result = await controller.extract_content_mistral_ocr_async(pdf_path)
+#### REST API
+```bash
+# Start the FastAPI server
+python src/api_rag.py
 ```
 
-#### 2. Visual Element Detection
-```python
-# Identify and analyze visual elements
-visual_elements = controller.extract_visual_elements_enhanced(chunk_content)
+#### Manual Ingestion
+```bash
+# Process documents manually
+python src/ingestion_manual_mistral.py
 ```
 
-#### 3. Contextual Enhancement
+#### Evaluation
+```bash
+# Run RAG evaluation
+python src/evaluation/run_evaluation.py
+```
+
+### Language Workflow
+
+#### 1. User Input
 ```python
-# Enhance chunks with visual context
-enhanced_chunk = await controller.contextualize_chunk_enhanced(
-    chunk, document_summary, book_title, page_num, visual_elements
+# User asks question in Spanish
+user_question = "¿Cuáles son los requisitos de seguridad?"
+```
+
+#### 2. Language Detection & Translation
+```python
+# Detect language and translate to English for search
+if detect_language(user_question) == "spanish":
+    search_query = translate_text(user_question, "spanish", "english")
+```
+
+#### 3. Knowledge Base Search
+```python
+# Search English KB with English query
+context = search_knowledge_base(search_query)
+```
+
+#### 4. LLM Processing
+```python
+# Send English context + English question to LLM
+response = llm.rag_process_llm(
+    context=english_context,
+    question=english_question,
+    language="español"  # Ensure Spanish output
 )
 ```
 
-#### 4. Annotation Extraction
+#### 5. Spanish Response
 ```python
-# Extract intelligent annotations
-annotations = controller.extract_annotations(chunk_content, chunk_id)
+# LLM responds in Spanish for user interface
+# Response: "Los requisitos de seguridad incluyen..."
 ```
 
-### API Limits and Considerations
+### API Endpoints
 
-#### Mistral OCR Limits
-- **Document Size**: Maximum 50MB per document
-- **Processing Time**: Varies by document complexity
-- **Concurrent Requests**: Rate limiting considerations
-- **Cost Optimization**: Efficient batch processing strategies
+#### RAG Query Endpoint
+```http
+POST /rag
+Content-Type: application/json
 
-#### Batch Processing Considerations
-- **Memory Usage**: Large document collections require adequate RAM
-- **Processing Time**: Visual content increases processing time
-- **Error Recovery**: Robust error handling for large batches
-- **Storage Requirements**: Enhanced chunks require more storage
+{
+  "question": "¿Cuáles son los requisitos de seguridad?",
+  "language": "spanish"
+}
+```
+
+#### Response Format
+```json
+{
+  "response": "Los requisitos de seguridad incluyen...",
+  "sources": [
+    {"document": "FMDS0200.pdf", "page": 153},
+    {"document": "FMDS0201.pdf", "page": 24}
+  ],
+  "workflow_info": "Spanish input → English search → Spanish output"
+}
+```
+
+### Services Used
+
+#### **Core AI Services:**
+- **Groq API**: LLM inference (`llama-3.3-70b-versatile`)
+- **Pinecone**: Vector similarity search and storage
+- **Mistral AI**: OCR and document processing
+- **Nomic AI**: Text embedding generation
+
+#### **Infrastructure:**
+- **Chainlit**: Web chat interface framework
+- **FastAPI**: REST API backend
+
+#### **Cost Considerations:**
+- **Groq**: Pay-per-token for LLM inference
+- **Pinecone**: Pay-per-vector for storage and search
+- **Mistral**: Pay-per-API call for OCR processing
+- **Nomic**: Pay-per-embedding generation
 
 ### Performance Optimization
 
-#### Visual Processing
-- **Parallel Analysis**: Concurrent visual element processing
-- **Memory Management**: Efficient handling of large images
-- **Caching Strategies**: Cache visual analysis results
+#### Search Optimization
+- **English KB**: Optimal semantic search performance
+- **Vector Indexing**: Efficient similarity search
+- **Metadata Filtering**: Context-aware result filtering
+- **Caching**: Response caching for common queries
 
-#### Batch Processing
-- **Concurrency Control**: Optimal parallel processing levels
-- **Resource Management**: Efficient memory and CPU usage
-- **Progress Monitoring**: Real-time status updates
-
-#### Vector Search
-- **Multimodal Indexing**: Efficient visual content indexing
-- **Query Optimization**: Enhanced search with visual context
-- **Result Ranking**: Improved relevance with visual elements
+#### Processing Efficiency
+- **Batch Processing**: Efficient document ingestion
+- **Parallel Processing**: Concurrent document analysis
+- **Memory Management**: Optimized chunk processing
+- **Error Recovery**: Robust error handling
 
 ### Security and Compliance
 
 #### Data Privacy
-- **Local Processing**: Sensitive document processing options
-- **Secure API**: Encrypted API communication
+- **API Security**: Secure API key management
 - **No Data Retention**: No persistent storage of sensitive content
+- **Secure Communication**: Encrypted API communication
 
 #### Regulatory Compliance
 - **Source Traceability**: Complete audit trail
 - **Visual Evidence**: Visual content preservation
-- **Annotation Tracking**: Annotation history and sources
+- **Metadata Tracking**: Comprehensive document metadata
 
 ### Monitoring and Evaluation
 
 #### Performance Metrics
-- **Processing Accuracy**: Text and visual extraction quality
-- **Visual Understanding**: Diagram and chart interpretation accuracy
-- **Annotation Quality**: Requirement and warning detection accuracy
-- **Search Relevance**: Enhanced retrieval performance
+- **Response Accuracy**: RAG response quality
+- **Search Relevance**: Document retrieval accuracy
+- **Language Quality**: Translation and response accuracy
+- **User Satisfaction**: End-user feedback
 
 #### Quality Assessment
-- **Multimodal Evaluation**: Text and visual content assessment
-- **Annotation Validation**: Expert review of automatic annotations
-- **User Satisfaction**: End-user feedback on responses
+- **RAGAS Evaluation**: Comprehensive RAG assessment
+- **Language Validation**: Translation quality verification
+- **Response Consistency**: Output consistency across queries
 
 ### Future Enhancements
 
 #### Planned Features
-- **Advanced Visual Analysis**: Deep learning for complex diagrams
-- **Interactive Annotations**: User-editable annotation system
-- **Real-time Processing**: Live document processing capabilities
+- **Advanced Visual Analysis**: Enhanced image and diagram understanding
+- **Multi-format Support**: Additional document formats
+- **Real-time Processing**: Live document processing
 - **Integration APIs**: Third-party system integration
 
 #### Technical Improvements
-- **Enhanced Visual Models**: Specialized models for technical content
-- **Advanced Annotation Types**: Domain-specific annotation categories
+- **Enhanced Embeddings**: Specialized models for technical content
+- **Advanced Search**: Multi-modal search capabilities
 - **Performance Optimization**: Faster processing and reduced costs
-- **Extended Evaluation**: Comprehensive multimodal assessment
+- **Extended Evaluation**: Comprehensive quality assessment
 
 ## Support and Maintenance
 
 ### Troubleshooting
-- **API Configuration**: Verify Mistral API key and permissions
+- **API Configuration**: Verify API keys and permissions
 - **Document Format**: Ensure PDF compatibility
 - **Processing Errors**: Check error logs and recovery options
 - **Performance Issues**: Monitor resource usage and optimization
@@ -318,4 +371,4 @@ annotations = controller.extract_annotations(chunk_content, chunk_id)
 - **Quality Assurance**: Regular evaluation of output quality
 - **Documentation Updates**: Keep implementation guides current
 
-This enhanced implementation provides a robust, scalable solution for multimodal regulatory compliance assistance with superior visual understanding and intelligent annotation capabilities. The **Mistral OCR integration** sets this system apart by providing comprehensive document understanding that goes beyond traditional text-only RAG systems. 
+This implementation provides a robust, scalable solution for multilingual regulatory compliance assistance with intelligent language handling and professional user experience. The **hybrid language approach** ensures optimal search performance while maintaining complete Spanish localization for end users. 

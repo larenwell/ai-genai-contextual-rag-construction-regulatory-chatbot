@@ -10,3 +10,4 @@ uv.lock
 testing_stuff_out.py
 
 **/__pycache__
+/output
