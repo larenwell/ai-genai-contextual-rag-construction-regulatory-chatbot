@@ -1,48 +1,40 @@
-
 [project]
-name = "ai-genai-contextual"
+name = "asistente-normativa-prototipo"
 version = "0.1.0"
+description = "Asistente virtual de normativa en español"
+authors = [{ name = "Laren Osorio Toribio", email = "losorio@rcp.pe" }]
 requires-python = ">=3.12"
-dependencies = [
-  # Core app Chainlit
-  "chainlit",
-  "fastapi",
-  "uvicorn",
-  "httpx",
-  "pydantic",
-  "python-dotenv",
-  # LLMs / vectores por API (ligero)
-  "openai",
-  "groq",
-  "pinecone-client",
-  "tiktoken",
-  # PDFs liviano (si no usas, bórralos)
-  "pypdf",
-  "pdfminer.six",
-  # utilidades
-  "loguru",
-  "rich",
-  "translate==3.6.1",
-]
 
-[project.optional-dependencies]
-# Todo lo pesado va aquí (NO se instala en Heroku)
-heavy = [
-  "transformers<5",
-  "sentence-transformers<6",
-  "torch",            # CPU/GPU; NO en Heroku
-  "triton",
+dependencies = [
   "pymupdf",
   "unstructured",
-  "pandas",
-  "numpy",
-  "scikit-learn",
-  "pyarrow",
-  "gradio",
-  "streamlit",
+  "sentence-transformers",
+  "qdrant-client",
   "langchain",
+  "transformers",
+  "accelerate",
+  "ollama",
+  "streamlit",
+  "python-dotenv",
+  "tqdm",
+  "scikit-learn",
+  "pandas",
+  "huggingface_hub",
+  "gradio",
+  "tiktoken",
+  "chainlit",
+  "langchain-ollama",
   "langchain-community",
+  "pinecone",
+  "mistralai",
+  "openpyxl",
+  "pypdf2",
+  "ragas",
+  "groq",
+  "asyncpg",
+  "boto3",
+  "translate"
 ]
 
 [tool.uv]
-
+managed = true
