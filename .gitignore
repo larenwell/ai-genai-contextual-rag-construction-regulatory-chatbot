@@ -3,11 +3,11 @@
 .venv
 venv
 /data
-/qdrant_storage
+/output
+/output_backup
 .env
 .DS_Store
 uv.lock
 testing_stuff_out.py
 
 **/__pycache__
-/output

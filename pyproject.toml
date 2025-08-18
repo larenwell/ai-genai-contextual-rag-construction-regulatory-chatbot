@@ -1,7 +1,7 @@
 [project]
-name = "rag-asistente-normativa"
+name = "asistente-normativa-prototipo"
 version = "0.1.0"
-description = "Asistente virtual de normativa en español con RAG + Qdrant + Streamlit"
+description = "Asistente virtual de normativa en español"
 authors = [{ name = "Laren Osorio Toribio", email = "losorio@rcp.pe" }]
 requires-python = ">=3.12"
 
