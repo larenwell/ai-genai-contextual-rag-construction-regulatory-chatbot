@@ -474,9 +474,7 @@ name = "contextual-rag-asistente-normativa"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
-    { name = "accelerate" },
     { name = "chainlit" },
-    { name = "gradio" },
     { name = "groq" },
     { name = "huggingface-hub" },
     { name = "langchain" },
@@ -485,22 +483,17 @@ dependencies = [
     { name = "ollama" },
     { name = "pandas" },
     { name = "pinecone" },
-    { name = "pymupdf" },
     { name = "python-dotenv" },
     { name = "qdrant-client" },
     { name = "ragas" },
-    { name = "scikit-learn" },
-    { name = "sentence-transformers" },
-    { name = "streamlit" },
     { name = "tiktoken" },
     { name = "tqdm" },
-    { name = "transformers" },
     { name = "translate" },
-    { name = "unstructured" },
 ]
 
 [package.dev-dependencies]
 local = [
+    { name = "accelerate" },
     { name = "datasets" },
     { name = "gradio" },
     { name = "pyarrow" },
@@ -510,14 +503,13 @@ local = [
     { name = "sentence-transformers" },
     { name = "streamlit" },
     { name = "torch" },
+    { name = "transformers" },
     { name = "unstructured" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "accelerate" },
     { name = "chainlit" },
-    { name = "gradio" },
     { name = "groq" },
     { name = "huggingface-hub" },
     { name = "langchain" },
@@ -526,22 +518,17 @@ requires-dist = [
     { name = "ollama" },
     { name = "pandas" },
     { name = "pinecone" },
-    { name = "pymupdf" },
     { name = "python-dotenv" },
     { name = "qdrant-client" },
     { name = "ragas" },
-    { name = "scikit-learn" },
-    { name = "sentence-transformers" },
-    { name = "streamlit" },
     { name = "tiktoken" },
     { name = "tqdm" },
-    { name = "transformers" },
     { name = "translate" },
-    { name = "unstructured" },
 ]
 
 [package.metadata.requires-dev]
 local = [
+    { name = "accelerate", specifier = ">=1.10.0" },
     { name = "datasets", specifier = ">=4.0.0" },
     { name = "gradio", specifier = ">=5.42.0" },
     { name = "pyarrow", specifier = ">=21.0.0" },
@@ -551,6 +538,7 @@ local = [
     { name = "sentence-transformers", specifier = ">=5.1.0" },
     { name = "streamlit", specifier = ">=1.48.1" },
     { name = "torch", specifier = ">=2.8.0" },
+    { name = "transformers", specifier = ">=4.55.2" },
     { name = "unstructured", specifier = ">=0.18.13" },
 ]
 

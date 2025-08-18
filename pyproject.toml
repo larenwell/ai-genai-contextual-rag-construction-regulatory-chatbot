@@ -6,21 +6,13 @@ authors = [{ name = "Laren Osorio Toribio", email = "losorio@rcp.pe" }]
 requires-python = ">=3.12"
 
 dependencies = [
-  "pymupdf",
-  "unstructured",
-  "sentence-transformers",
   "qdrant-client",
   "langchain",
-  "transformers",
-  "accelerate",
   "ollama",
-  "streamlit",
   "python-dotenv",
   "tqdm",
-  "scikit-learn",
   "pandas",
   "huggingface_hub",
-  "gradio",
   "tiktoken",
   "chainlit",
   "langchain-ollama",
@@ -28,7 +20,7 @@ dependencies = [
   "pinecone",
   "groq",
   "translate",
-  "ragas"
+  "ragas",
 ]
 
 [tool.uv]
@@ -36,6 +28,7 @@ managed = true
 
 [dependency-groups]
 local = [
+    "accelerate>=1.10.0",
     "datasets>=4.0.0",
     "gradio>=5.42.0",
     "pyarrow>=21.0.0",
@@ -45,5 +38,6 @@ local = [
     "sentence-transformers>=5.1.0",
     "streamlit>=1.48.1",
     "torch>=2.8.0",
+    "transformers>=4.55.2",
     "unstructured>=0.18.13",
 ]
