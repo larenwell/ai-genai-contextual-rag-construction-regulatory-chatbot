@@ -44,6 +44,7 @@ The system encompasses the following key areas:
 - Pinecone API key for vector database
 - Mistral AI API key for OCR processing
 - Docker (optional, for local services)
+- Ollama Embedding Model
 
 ### Installation
 
@@ -66,7 +67,16 @@ The system encompasses the following key areas:
    python --version  # should show 3.12.x
    ```
 
-4. **Set up environment variables**
+4. **Install and setup Ollama**
+   ```bash
+   # Install Ollama (if not already installed)
+   curl -fsSL https://ollama.ai/install.sh | sh
+   
+   # Pull Dolphin-Mistral model
+   ollama pull nomic-embed-text
+   ```
+
+5. **Set up environment variables**
    Create a `.env` file in the project root:
    ```env
    GROQ_API_KEY=your_groq_api_key
