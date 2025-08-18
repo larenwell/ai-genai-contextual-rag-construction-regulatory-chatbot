@@ -33,3 +33,17 @@ dependencies = [
 
 [tool.uv]
 managed = true
+
+[dependency-groups]
+local = [
+    "datasets>=4.0.0",
+    "gradio>=5.42.0",
+    "pyarrow>=21.0.0",
+    "pymupdf>=1.26.3",
+    "scikit-learn>=1.7.1",
+    "scipy>=1.16.1",
+    "sentence-transformers>=5.1.0",
+    "streamlit>=1.48.1",
+    "torch>=2.8.0",
+    "unstructured>=0.18.13",
+]

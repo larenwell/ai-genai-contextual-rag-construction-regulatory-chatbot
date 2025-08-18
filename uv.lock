@@ -499,6 +499,20 @@ dependencies = [
     { name = "unstructured" },
 ]
 
+[package.dev-dependencies]
+local = [
+    { name = "datasets" },
+    { name = "gradio" },
+    { name = "pyarrow" },
+    { name = "pymupdf" },
+    { name = "scikit-learn" },
+    { name = "scipy" },
+    { name = "sentence-transformers" },
+    { name = "streamlit" },
+    { name = "torch" },
+    { name = "unstructured" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "accelerate" },
@@ -524,6 +538,20 @@ requires-dist = [
     { name = "transformers" },
     { name = "translate" },
     { name = "unstructured" },
+]
+
+[package.metadata.requires-dev]
+local = [
+    { name = "datasets", specifier = ">=4.0.0" },
+    { name = "gradio", specifier = ">=5.42.0" },
+    { name = "pyarrow", specifier = ">=21.0.0" },
+    { name = "pymupdf", specifier = ">=1.26.3" },
+    { name = "scikit-learn", specifier = ">=1.7.1" },
+    { name = "scipy", specifier = ">=1.16.1" },
+    { name = "sentence-transformers", specifier = ">=5.1.0" },
+    { name = "streamlit", specifier = ">=1.48.1" },
+    { name = "torch", specifier = ">=2.8.0" },
+    { name = "unstructured", specifier = ">=0.18.13" },
 ]
 
 [[package]]
