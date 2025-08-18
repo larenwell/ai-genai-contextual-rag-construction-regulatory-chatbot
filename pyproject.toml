@@ -11,20 +11,18 @@ dependencies = [
   "httpx",
   "pydantic",
   "python-dotenv",
-
   # LLMs / vectores por API (ligero)
   "openai",
   "groq",
   "pinecone-client",
   "tiktoken",
-
   # PDFs liviano (si no usas, bórralos)
   "pypdf",
   "pdfminer.six",
-
   # utilidades
   "loguru",
   "rich",
+  "translate==3.6.1",
 ]
 
 [project.optional-dependencies]

@@ -25,6 +25,7 @@ dependencies = [
     { name = "python-dotenv" },
     { name = "rich" },
     { name = "tiktoken" },
+    { name = "translate" },
     { name = "uvicorn" },
 ]
 
@@ -73,6 +74,7 @@ requires-dist = [
     { name = "tiktoken" },
     { name = "torch", marker = "extra == 'heavy'" },
     { name = "transformers", marker = "extra == 'heavy'", specifier = "<5" },
+    { name = "translate", specifier = "==3.6.1" },
     { name = "triton", marker = "extra == 'heavy'" },
     { name = "unstructured", marker = "extra == 'heavy'" },
     { name = "uvicorn" },
@@ -1228,6 +1230,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/24/2c/b55c4a27a56dd9a00bb2812c404b57f8b7aec0cdbff9fdc61acdd73359bc/Lazify-0.4.0.tar.gz", hash = "sha256:7102bfe63e56de2ab62b3bc661a7190c4056771a8624f04a8b785275c3dd1f9b", size = 2968, upload-time = "2018-06-14T13:12:20.752Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/03/a5/866b44697cee47d1cae429ed370281d937ad4439f71af82a6baaa139d26a/Lazify-0.4.0-py2.py3-none-any.whl", hash = "sha256:c2c17a7a33e9406897e3f66fde4cd3f84716218d580330e5af10cfe5a0cd195a", size = 3107, upload-time = "2018-06-14T13:12:22.273Z" },
+]
+
+[[package]]
+name = "libretranslatepy"
+version = "2.1.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ef/ec/9b31f896697e164204ac4a31c9cfc31c0fee97ca5b97829d24a9cfc7d33c/libretranslatepy-2.1.1.tar.gz", hash = "sha256:3f28e1b990ba5f514ae215c08ace0c4e2327eeccaa356983aefbca3a25ecc568", size = 2796, upload-time = "2021-06-16T11:59:00.772Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/24/54/044ecbf4eeba3f3feee70d496f34f397dc20714cdb80dfa8bc01e7409f88/libretranslatepy-2.1.1-py3-none-any.whl", hash = "sha256:bf9f8b0003c94f34e141553b7ec0a02876297c06955f5efea49afbc9f85303a9", size = 3169, upload-time = "2021-06-16T11:58:59.334Z" },
 ]
 
 [[package]]
@@ -3834,6 +3845,21 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/70/a5/d8b8a1f3a051daeb5f11253bb69fc241f193d1c0566e299210ed9220ff4e/transformers-4.55.2.tar.gz", hash = "sha256:a45ec60c03474fd67adbce5c434685051b7608b3f4f167c25aa6aeb1cad16d4f", size = 9571466, upload-time = "2025-08-13T18:25:43.767Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/db/5a/022ac010bedfb5119734cf9d743cf1d830cb4c604f53bb1552216f4344dc/transformers-4.55.2-py3-none-any.whl", hash = "sha256:097e3c2e2c0c9681db3da9d748d8f9d6a724c644514673d0030e8c5a1109f1f1", size = 11269748, upload-time = "2025-08-13T18:25:40.394Z" },
+]
+
+[[package]]
+name = "translate"
+version = "3.6.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "click" },
+    { name = "libretranslatepy" },
+    { name = "lxml" },
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d1/9d/692066b9e26176a93ce627bf467bca48f198eb0e036337a5180d566c9561/translate-3.6.1.tar.gz", hash = "sha256:7e70ffa46f193cc744be7c88b8e1323f10f6b2bb90d24bb5d29fdf1e56618783", size = 18261, upload-time = "2021-07-06T03:27:19.574Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e1/54/df0d3e62636f291d716caa44c5c9590af8e6f225c59d7874051da6428c06/translate-3.6.1-py2.py3-none-any.whl", hash = "sha256:cebfb004989d9a2ab0d24c0c5805783c7f4e07243ea4ed2a8f1809d072bf712b", size = 12702, upload-time = "2021-07-06T03:27:16.177Z" },
 ]
 
 [[package]]
