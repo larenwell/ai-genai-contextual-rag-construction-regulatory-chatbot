@@ -21,6 +21,7 @@ dependencies = [
   "groq",
   "translate",
   "ragas",
+  "asyncpg>=0.30.0",
 ]
 
 [tool.uv]
