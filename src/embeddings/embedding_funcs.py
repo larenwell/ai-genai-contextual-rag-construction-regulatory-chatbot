@@ -52,11 +52,22 @@ class EmbeddingController:
         try:
             vectors_to_upsert = []
             for i, (embedding, chunk) in enumerate(zip(embeddings, chunks)):
+                # Extract text content from chunk
+                if isinstance(chunk, dict):
+                    text_content = chunk.get('content', str(chunk))
+                    # Extract metadata from chunk, excluding the content field
+                    chunk_meta = {k: v for k, v in chunk.get('metadata', {}).items() 
+                                if k != 'content' and isinstance(v, (str, int, float, bool, list))}
+                else:
+                    text_content = str(chunk)
+                    chunk_meta = {}
+                
                 vector_data = {
                     'id': str(uuid.uuid4()),
                     'values': embedding,
                     'metadata': {
-                        'text': chunk,
+                        'text': text_content,
+                        **chunk_meta,
                         **({} if chunk_metadata is None else chunk_metadata[i])
                     }
                 }

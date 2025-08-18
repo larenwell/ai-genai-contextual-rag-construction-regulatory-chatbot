@@ -1,8 +1,10 @@
 .chainlit
 .files
 .venv
+venv
 /data
-/qdrant_storage
+/output
+/output_backup
 .env
 .DS_Store
 uv.lock

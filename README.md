@@ -1,49 +1,50 @@
-# AI Contextual RAG Assistant for Regulatory Compliance
+# AI Contextual RAG Assistant - Normativa Sincro
 
 ## Project Description
 
-This project implements an intelligent virtual assistant for regulatory compliance in Spanish, designed to help users understand, interpret, and apply regulations, laws, and compliance requirements across various contexts (legal, administrative, technical, or corporate). The system leverages advanced AI technologies including **Contextual Retrieval-Augmented Generation (RAG)**, vector embeddings, and multilingual processing to provide accurate, contextual responses based on regulatory documents.
+This project implements a **Contextual Retrieval-Augmented Generation (RAG)** system designed for regulatory compliance assistance. The system features a **Spanish user interface** with **English knowledge base storage**, providing multilingual support while maintaining optimal search performance.
 
-**Key Innovation**: This implementation uses **contextual retrieval** rather than traditional RAG, where document chunks are enhanced with contextual information using Dolphin-Mistral LLM before embedding generation, significantly improving retrieval accuracy and relevance.
+**Key Innovation**: This implementation uses a **hybrid language approach** where documents are processed and stored in English for optimal search, while user interactions occur entirely in Spanish, with intelligent translation handling throughout the workflow.
 
 ## Scope
 
 The system encompasses the following key areas:
 
-- **PDF Extraction and Chunking**: PDF extraction, text cleaning, and intelligent chunking with metadata preservation
-- **Contextual Document Processing**: AI-enhanced contextual generation of each chunk with Dolphin-Mistral for superior retrieval.
-- **Multilingual Support**: Spanish user interface with English document processing and automatic translation
-- **Contextual Vector Search**: Semantic similarity search using contextually enhanced embeddings in Pinecone Knowledge Database
-- **AI-Powered Responses**: Contextual answers using Groq's LLM (Llama 3.3 70B) with regulatory expertise
-- **User Interface**: Interactive chat interface built with Chainlit for seamless user experience
-- **Evaluation Framework**: RAG performance assessment using RAGAS metrics for quality assurance
+- **Multilingual RAG System**: Spanish UI with English knowledge base for optimal search
+- **Document Processing**: PDF extraction and analysis using Mistral OCR
+- **Intelligent Translation**: Automatic language detection and translation between Spanish and English
+- **Vector Search**: Semantic similarity search using Pinecone vector database
+- **AI-Powered Responses**: Contextual answers using Groq LLM models
+- **Professional UI**: Clean, modern interface built with Chainlit
+- **REST API**: FastAPI backend for programmatic access
+- **Quality Assurance**: Comprehensive evaluation framework
 
 ## Objectives
 
 ### Primary Objectives
-1. **Regulatory Compliance Assistance**: Provide accurate, contextual responses to regulatory questions
-2. **Contextual Retrieval**: Implement AI-enhanced document chunking for superior search relevance
-3. **Multilingual Processing**: Handle Spanish queries while processing English regulatory documents
-4. **Source Attribution**: Always provide traceable sources for responses
-5. **Professional Communication**: Maintain formal, precise, and professional tone
+1. **Multilingual Regulatory Compliance**: Spanish interface with English document processing
+2. **Intelligent Language Handling**: Automatic translation for optimized search
+3. **Contextual Retrieval**: AI-enhanced document chunking with metadata preservation
+4. **Professional Communication**: Maintain formal, precise, and professional tone
+5. **Scalable Architecture**: Modular design for easy maintenance and extension
 
 ### Technical Objectives
-1. **Contextual RAG Architecture**: Advanced retrieval system using LLM-enhanced chunks
-2. **Scalable Architecture**: Modular design for easy maintenance and extension
-3. **Performance Optimization**: Efficient document processing and retrieval
-4. **Quality Assurance**: Comprehensive evaluation framework for response quality
-5. **User Experience**: Intuitive chat interface with clear source citations
+1. **Language Workflow**: Spanish input → English search → Spanish output
+2. **Vector Search Optimization**: Efficient semantic search with English embeddings
+3. **Metadata Preservation**: Visual elements, tables, and contextual information
+4. **Performance Optimization**: Fast response times and efficient processing
+5. **Quality Assurance**: Comprehensive evaluation framework
 
 ## Implementation Guide
 
 ### Prerequisites
 
-- Python 3.13 or higher
-- Docker and Docker Compose (for local vector database)
-- Ollama with Dolphin-Mistral model installed
-- API keys for:
-  - Pinecone (vector database)
-  - Groq (LLM service)
+- Python 3.12 or higher
+- Groq API key for LLM access
+- Pinecone API key for vector database
+- Mistral AI API key for OCR processing
+- Docker (optional, for local services)
+- Ollama Embedding Model
 
 ### Installation
 
@@ -55,30 +56,33 @@ The system encompasses the following key areas:
 
 2. **Install dependencies**
    ```bash
+   pip install -r requirements.txt
+   # or using uv
    uv sync
    ```
 
-3. **Crear y activar el virtualenv**
-    ```bash
-    source .venv/bin/activate
-    python --version  # debe mostrar 3.12.x
-    ```
+3. **Create and activate virtual environment**
+   ```bash
+   source .venv/bin/activate
+   python --version  # should show 3.12.x
+   ```
 
-4. **Install and setup Ollama with Dolphin-Mistral**
+4. **Install and setup Ollama**
    ```bash
    # Install Ollama (if not already installed)
    curl -fsSL https://ollama.ai/install.sh | sh
    
    # Pull Dolphin-Mistral model
-   ollama pull dolphin-mistral
+   ollama pull nomic-embed-text
    ```
 
 5. **Set up environment variables**
    Create a `.env` file in the project root:
    ```env
+   GROQ_API_KEY=your_groq_api_key
    PINECONE_API_KEY=your_pinecone_api_key
    PINECONE_INDEX=your_pinecone_index_name
-   GROQ_API_KEY=your_groq_api_key
+   MISTRAL_API_KEY=your_mistral_api_key
    ```
 
 ### Project Structure
@@ -86,250 +90,295 @@ The system encompasses the following key areas:
 ```
 ai-contextual-rag-asistente-normativa-sincro/
 ├── src/
+│   ├── analysis/
+│   │   └── pdf_analyzer.py                 # PDF analysis utilities
+│   ├── config/
+│   │   ├── display_config.py               # UI display configuration
+│   │   └── prompt_config.py                # LLM prompt management
 │   ├── embeddings/
-│   │   └── embedding_funcs.py      # Vector embedding management
+│   │   └── embedding_funcs.py              # Vector embedding management
 │   ├── evaluation/
-│   │   └── evaluate_rag.py         # RAG performance evaluation
+│   │   ├── evaluation_ragas.py             # RAG evaluation framework
+│   │   ├── run_evaluation.py               # Evaluation execution
+│   │   └── sample_questions.json           # Test questions for evaluation
 │   ├── ingestion/
-│   │   └── ingest_funcs.py         # Document processing pipeline
+│   │   └── ingest_mistral.py               # Mistral OCR document processing
 │   ├── llm/
-│   │   ├── context_llm.py         # Contextual LLM processing (Dolphin-Mistral)
-│   │   └── groq_llm.py            # Groq LLM implementation
+│   │   └── groq_llm.py                     # Groq LLM integration
 │   ├── translation/
-│   │   └── translate.py            # Text translation utilities
-│   └── rag_process.py              # Main RAG processing logic
+│   │   └── translate.py                    # Text translation utilities
+│   ├── api_rag.py                          # FastAPI REST endpoint
+│   ├── frontend_rag.py                     # Chainlit web interface
+│   └── ingestion_manual_mistral.py         # Manual ingestion script
 ├── scripts/
-│   ├── build_index.py              # Index building orchestration
-│   ├── run_app.sh                  # Application startup script
-│   └── run_evaluation.sh           # Evaluation execution script
-├── docker-compose.yml              # Local service configuration
-└── pyproject.toml                  # Project dependencies
+│   ├── setup_pinecone_index.py             # Pinecone configuration
+│   └── setup_project_structure.py          # Project initialization
+├── tests/                                  # Test files
+├── output/                                 # Processing results and reports
+├── chainlit.md                             # Chainlit welcome screen and CSS
+└── pyproject.toml                          # Project dependencies
 ```
 
 ## Implementation Details
 
 ### Core Components
 
-#### 1. Contextual Document Processing (`src/llm/context_llm.py`)
-- **Document Title Extraction**: AI-powered title identification from document content
-- **Main Idea Generation**: Extracts the core concept and purpose of each document
-- **Contextual Chunk Enhancement**: Generates contextual descriptions for each text chunk
-- **Model**: Dolphin-Mistral via Ollama for contextual understanding
-- **Context Preservation**: Maintains document-level context for improved retrieval
+#### 1. Language Workflow System
+- **Spanish Input**: User questions in Spanish
+- **English Translation**: Automatic translation for KB search optimization
+- **English Context**: Retrieved from English knowledge base
+- **Spanish Output**: LLM responses in Spanish for user interface
 
-#### 2. Document Ingestion Pipeline (`src/ingestion/ingest_funcs.py`)
-- **PDF Text Extraction**: Extracts text from PDF documents with metadata
-- **Intelligent Chunking**: Splits text into optimal chunks (1000 chars with 200 char overlap)
-- **Contextual Enhancement**: Each chunk is enriched with contextual information
-- **Metadata Preservation**: Maintains page numbers, source information, and chunk relationships
+#### 2. Document Processing (`src/ingestion/ingest_mistral.py`)
+- **PDF Extraction**: Text, images, tables, and visual elements
+- **Content Chunking**: Intelligent document segmentation
+- **Metadata Preservation**: Visual elements, page numbers, and context
+- **English Storage**: All content stored in English for optimal search
 
-#### 3. Contextual Vector Embedding System (`src/embeddings/embedding_funcs.py`)
-- **Model**: Uses Nomic Embed Text model via Ollama
-- **Contextual Embeddings**: Generates embeddings from contextually enhanced chunks
-- **Vector Database**: Pinecone for scalable similarity search
-- **Batch Processing**: Efficient upsert operations with configurable batch sizes
-- **Query Interface**: Semantic search with configurable top-k results
+#### 3. Translation Module (`src/translation/translate.py`)
+- **Language Detection**: Automatic Spanish/English identification
+- **Bidirectional Translation**: Spanish ↔ English conversion
+- **Search Optimization**: English queries for English KB
+- **Response Localization**: Spanish output for Spanish UI
 
-#### 4. LLM Integration (`src/llm/groq_llm.py`)
-- **Model**: Llama 3.3 70B Versatile via Groq API
-- **Prompt Engineering**: Specialized system and user prompts for regulatory compliance
-- **Temperature Control**: Low temperature (0.1) for consistent, factual responses
-- **Spanish Output**: Always responds in Spanish regardless of input language
+#### 4. Vector Search System (`src/embeddings/embedding_funcs.py`)
+- **Nomic Embeddings**: `nomic-embed-text` model for vector generation
+- **Pinecone Integration**: Vector database for similarity search
+- **Metadata Indexing**: Visual elements and contextual information
+- **Semantic Search**: Context-aware document retrieval
 
-#### 5. Translation Layer (`src/translation/translate.py`)
-- **Bidirectional Translation**: Spanish ↔ English translation
-- **Query Processing**: Translates user queries to English for document search
-- **Response Localization**: Ensures responses are in Spanish
+#### 5. LLM Integration (`src/llm/groq_llm.py`)
+- **Groq API**: `llama-3.3-70b-versatile` model
+- **Prompt Management**: Centralized prompt configuration
+- **Language Control**: Ensures Spanish responses
+- **Context Processing**: Handles English input, generates Spanish output
 
-#### 6. Contextual RAG Processing (`src/rag_process.py`)
-- **Contextual Retrieval**: Semantic search using contextually enhanced embeddings
-- **Response Generation**: Context-aware answer generation
-- **Source Attribution**: Automatic citation of consulted sources
-- **Conversation History**: Maintains chat context for follow-up questions
+#### 6. User Interface (`src/frontend_rag.py`)
+- **Chainlit Framework**: Modern chat interface
+- **Spanish Localization**: Complete Spanish UI
+- **Source Display**: Clean source attribution
+- **Responsive Design**: Professional and accessible interface
+
+#### 7. REST API (`src/api_rag.py`)
+- **FastAPI Backend**: Programmatic access to RAG system
+- **Language Workflow**: Same multilingual logic as frontend
+- **Error Handling**: Comprehensive error management
+- **Response Formatting**: Structured API responses
 
 ### Key Features
 
-#### Contextual Retrieval (vs Traditional RAG)
-- **AI-Enhanced Chunks**: Each document chunk is enriched with contextual information
-- **Document-Level Understanding**: Maintains awareness of document structure and purpose
-- **Improved Relevance**: Contextual embeddings provide superior search accuracy
-- **Semantic Context**: Chunks include their role and relationship within the document
+#### Multilingual Support
+- **Spanish Interface**: Complete user experience in Spanish
+- **English Knowledge Base**: Optimal search performance
+- **Automatic Translation**: Seamless language handling
+- **Consistent Experience**: Same workflow in both languages
 
-#### Multilingual Processing
-- User interface in Spanish
-- Document processing in English
-- Automatic translation layer
-- Consistent Spanish responses
+#### Document Processing
+- **Visual Elements**: Images, tables, and diagrams preserved
+- **Metadata Rich**: Page numbers, chunk types, and context
+- **Intelligent Chunking**: Context-aware document segmentation
+- **Batch Processing**: Efficient handling of multiple documents
 
-#### Source Attribution
-- Automatic citation of consulted documents
-- Page number references
-- Relevance scoring (optional)
-- Structured source display
+#### Search and Retrieval
+- **Semantic Search**: Context-aware document retrieval
+- **Visual Context**: Visual elements enhance search relevance
+- **Source Attribution**: Clear document and page references
+- **Relevance Scoring**: Intelligent result ranking
 
-#### Quality Assurance
-- RAGAS evaluation framework
-- Context recall metrics
-- Answer relevancy assessment
-- Faithfulness evaluation
+#### User Experience
+- **Professional UI**: Clean, modern interface design
+- **Responsive Design**: Works on all device sizes
+- **Source Display**: Clear attribution and references
+- **Error Handling**: Graceful error recovery
 
 ### Configuration
 
 #### Environment Variables
 ```env
+GROQ_API_KEY=your_groq_api_key
 PINECONE_API_KEY=your_pinecone_api_key
 PINECONE_INDEX=your_pinecone_index_name
-GROQ_API_KEY=your_groq_api_key
+MISTRAL_API_KEY=your_mistral_api_key
 ```
 
 #### Model Configuration
-- **Contextual LLM**: `dolphin-mistral` (via Ollama)
-- **Embedding Model**: `nomic-embed-text` (via Ollama)
-- **Response LLM**: `llama-3.3-70b-versatile` (via Groq)
-- **Chunk Size**: 1000 characters
-- **Chunk Overlap**: 200 characters
-- **Top-k Results**: 5 (configurable)
-- **Context Window**: 12,000 characters (for contextual processing)
-
-### Contextual Processing Workflow
-
-#### 1. Document Analysis
-```python
-# Extract document title and main idea
-title = context_llm.identify_title(document_text)
-main_idea = context_llm.generate_main_text_idea(document_text)
-```
-
-#### 2. Contextual Chunk Enhancement
-```python
-# For each chunk, generate contextual description
-chunk_context = context_llm.generate_chunk_context(main_idea, chunk_text)
-enhanced_chunk = f"{chunk_context}\n\n{chunk_text}"
-```
-
-#### 3. Embedding Generation
-```python
-# Generate embeddings from contextually enhanced chunks
-embeddings = embedding_admin.generate_embeddings(enhanced_chunk)
-```
+- **LLM Model**: `llama-3.3-70b-versatile` (Groq)
+- **Embedding Model**: `nomic-embed-text` (768 dimensions)
+- **OCR Model**: Mistral OCR for document processing
+- **Chunk Size**: Configurable text segmentation
+- **Vector Database**: Pinecone for similarity search
 
 ### Usage
 
-#### Starting the Application
+#### Web Interface
 ```bash
-# Using the provided script
-./scripts/run_app.sh
-
-# Or directly with chainlit
-chainlit run src/rag_process.py
+# Start the Chainlit interface
+python -m chainlit run src/frontend_rag.py
 ```
 
-#### Building Document Index
+#### REST API
 ```bash
-# Run the complete indexing pipeline
-python scripts/build_index.py
+# Start the FastAPI server
+python src/api_rag.py
 ```
 
-#### Running Evaluation
+#### Manual Ingestion
 ```bash
-# Execute RAG performance evaluation
-python scripts/run_evaluation.sh
+# Process documents manually
+python src/ingestion_manual_mistral.py
 ```
 
-### API Limits and Considerations
+#### Evaluation
+```bash
+# Run RAG evaluation
+python src/evaluation/run_evaluation.py
+```
 
-#### Groq API Limits
-- Daily query limit: 1000-1500 queries
-- Rate limiting considerations
-- Cost optimization strategies
+### Language Workflow
 
-#### Ollama Considerations
-- Local Dolphin-Mistral model required
-- Memory usage for contextual processing
-- Processing time for chunk enhancement
+#### 1. User Input
+```python
+# User asks question in Spanish
+user_question = "¿Cuáles son los requisitos de seguridad?"
+```
 
-#### Pinecone Considerations
-- Vector dimension: 768 (nomic-embed-text)
-- Index type: Serverless (AWS us-east-1)
-- Metric: Cosine similarity
-- Batch size: 100 vectors per upsert
+#### 2. Language Detection & Translation
+```python
+# Detect language and translate to English for search
+if detect_language(user_question) == "spanish":
+    search_query = translate_text(user_question, "spanish", "english")
+```
+
+#### 3. Knowledge Base Search
+```python
+# Search English KB with English query
+context = search_knowledge_base(search_query)
+```
+
+#### 4. LLM Processing
+```python
+# Send English context + English question to LLM
+response = llm.rag_process_llm(
+    context=english_context,
+    question=english_question,
+    language="español"  # Ensure Spanish output
+)
+```
+
+#### 5. Spanish Response
+```python
+# LLM responds in Spanish for user interface
+# Response: "Los requisitos de seguridad incluyen..."
+```
+
+### API Endpoints
+
+#### RAG Query Endpoint
+```http
+POST /rag
+Content-Type: application/json
+
+{
+  "question": "¿Cuáles son los requisitos de seguridad?",
+  "language": "spanish"
+}
+```
+
+#### Response Format
+```json
+{
+  "response": "Los requisitos de seguridad incluyen...",
+  "sources": [
+    {"document": "FMDS0200.pdf", "page": 153},
+    {"document": "FMDS0201.pdf", "page": 24}
+  ],
+  "workflow_info": "Spanish input → English search → Spanish output"
+}
+```
+
+### Services Used
+
+#### **Core AI Services:**
+- **Groq API**: LLM inference (`llama-3.3-70b-versatile`)
+- **Pinecone**: Vector similarity search and storage
+- **Mistral AI**: OCR and document processing
+- **Nomic AI**: Text embedding generation
+
+#### **Infrastructure:**
+- **Chainlit**: Web chat interface framework
+- **FastAPI**: REST API backend
+
+#### **Cost Considerations:**
+- **Groq**: Pay-per-token for LLM inference
+- **Pinecone**: Pay-per-vector for storage and search
+- **Mistral**: Pay-per-API call for OCR processing
+- **Nomic**: Pay-per-embedding generation
 
 ### Performance Optimization
 
-#### Contextual Processing
-- Efficient chunk enhancement pipeline
-- Memory management for large documents
-- Parallel processing capabilities
+#### Search Optimization
+- **English KB**: Optimal semantic search performance
+- **Vector Indexing**: Efficient similarity search
+- **Metadata Filtering**: Context-aware result filtering
+- **Caching**: Response caching for common queries
 
-#### Document Processing
-- Parallel processing for large documents
-- Memory-efficient chunking
-- Metadata optimization
-
-#### Vector Search
-- Efficient batch operations
-- Query optimization
-- Index maintenance
-
-#### Response Generation
-- Context length optimization
-- Prompt efficiency
-- Caching strategies
+#### Processing Efficiency
+- **Batch Processing**: Efficient document ingestion
+- **Parallel Processing**: Concurrent document analysis
+- **Memory Management**: Optimized chunk processing
+- **Error Recovery**: Robust error handling
 
 ### Security and Compliance
 
 #### Data Privacy
-- Local document processing
-- Local contextual enhancement (Ollama)
-- Secure API key management
-- No data retention in external services
+- **API Security**: Secure API key management
+- **No Data Retention**: No persistent storage of sensitive content
+- **Secure Communication**: Encrypted API communication
 
 #### Regulatory Compliance
-- Source traceability
-- Audit trail capabilities
-- Professional response standards
+- **Source Traceability**: Complete audit trail
+- **Visual Evidence**: Visual content preservation
+- **Metadata Tracking**: Comprehensive document metadata
 
 ### Monitoring and Evaluation
 
 #### Performance Metrics
-- Response accuracy
-- Context relevance
-- User satisfaction
-- System performance
+- **Response Accuracy**: RAG response quality
+- **Search Relevance**: Document retrieval accuracy
+- **Language Quality**: Translation and response accuracy
+- **User Satisfaction**: End-user feedback
 
 #### Quality Assessment
-- RAGAS evaluation framework
-- Automated testing
-- Manual review processes
+- **RAGAS Evaluation**: Comprehensive RAG assessment
+- **Language Validation**: Translation quality verification
+- **Response Consistency**: Output consistency across queries
 
 ### Future Enhancements
 
 #### Planned Features
-- Multi-document support
-- Advanced filtering options
-- Export capabilities
-- Integration APIs
+- **Advanced Visual Analysis**: Enhanced image and diagram understanding
+- **Multi-format Support**: Additional document formats
+- **Real-time Processing**: Live document processing
+- **Integration APIs**: Third-party system integration
 
 #### Technical Improvements
-- Enhanced contextual strategies
-- Advanced prompt engineering
-- Performance optimization
-- Extended evaluation metrics
+- **Enhanced Embeddings**: Specialized models for technical content
+- **Advanced Search**: Multi-modal search capabilities
+- **Performance Optimization**: Faster processing and reduced costs
+- **Extended Evaluation**: Comprehensive quality assessment
 
 ## Support and Maintenance
 
 ### Troubleshooting
-- Check API key configuration
-- Verify Pinecone index status
-- Monitor Groq API usage
-- Ensure Ollama is running with Dolphin-Mistral
-- Review error logs
+- **API Configuration**: Verify API keys and permissions
+- **Document Format**: Ensure PDF compatibility
+- **Processing Errors**: Check error logs and recovery options
+- **Performance Issues**: Monitor resource usage and optimization
 
 ### Maintenance Tasks
-- Regular index updates
-- Performance monitoring
-- Security updates
-- Dependency management
-- Ollama model updates
+- **Regular Updates**: Keep dependencies and models current
+- **Performance Monitoring**: Track processing efficiency
+- **Quality Assurance**: Regular evaluation of output quality
+- **Documentation Updates**: Keep implementation guides current
 
-This implementation provides a robust, scalable solution for regulatory compliance assistance with strong emphasis on accuracy, traceability, and user experience. The **contextual retrieval approach** sets this system apart from traditional RAG implementations by providing superior search relevance through AI-enhanced document understanding. 
+This implementation provides a robust, scalable solution for multilingual regulatory compliance assistance with intelligent language handling and professional user experience. The **hybrid language approach** ensures optimal search performance while maintaining complete Spanish localization for end users.
