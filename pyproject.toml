@@ -44,7 +44,23 @@ heavy = [
   "streamlit",
   "langchain",
   "langchain-community",
+<<<<<<< HEAD
 ]
 
 [tool.uv]
 
+=======
+  "pinecone",
+  "mistralai",
+  "openpyxl",
+  "pypdf2",
+  "ragas",
+  "groq",
+  "asyncpg",
+  "boto3",
+  "translate",
+]
+
+[tool.uv]
+managed = true
+>>>>>>> dev
