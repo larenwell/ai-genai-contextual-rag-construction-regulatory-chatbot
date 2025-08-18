@@ -33,7 +33,7 @@ dependencies = [
   "groq",
   "asyncpg",
   "boto3",
-  "translate"
+  "translate",
 ]
 
 [tool.uv]
