@@ -9,5 +9,6 @@ venv
 .DS_Store
 uv.lock
 testing_stuff_out.py
+uv.lock
 
 **/__pycache__

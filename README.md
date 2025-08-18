@@ -371,4 +371,4 @@ Content-Type: application/json
 - **Quality Assurance**: Regular evaluation of output quality
 - **Documentation Updates**: Keep implementation guides current
 
-This implementation provides a robust, scalable solution for multilingual regulatory compliance assistance with intelligent language handling and professional user experience. The **hybrid language approach** ensures optimal search performance while maintaining complete Spanish localization for end users. 
+This implementation provides a robust, scalable solution for multilingual regulatory compliance assistance with intelligent language handling and professional user experience. The **hybrid language approach** ensures optimal search performance while maintaining complete Spanish localization for end users.
