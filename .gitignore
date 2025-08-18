@@ -3,8 +3,7 @@
 .venv
 venv
 /data
-/output
-/output_backup
+/src/output*
 .env
 .DS_Store
 uv.lock
