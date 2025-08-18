@@ -3,7 +3,13 @@
 .venv
 venv
 /data
-/src/output*
+# Output and generated files
+src/output/
+src/output/*
+src/output_bk*/
+src/output_bk*/*
+output/
+output/*
 .env
 .DS_Store
 uv.lock
