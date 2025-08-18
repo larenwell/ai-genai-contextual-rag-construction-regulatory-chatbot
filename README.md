@@ -114,7 +114,7 @@ ai-contextual-rag-asistente-normativa-sincro/
 │   ├── setup_pinecone_index.py             # Pinecone configuration
 │   └── setup_project_structure.py          # Project initialization
 ├── tests/                                  # Test files
-├── output/                                 # Processing results and reports
+├── src/output/                             # Processing results and reports
 ├── chainlit.md                             # Chainlit welcome screen and CSS
 └── pyproject.toml                          # Project dependencies
 ```
