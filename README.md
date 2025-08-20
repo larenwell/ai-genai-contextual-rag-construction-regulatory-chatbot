@@ -114,7 +114,10 @@ ai-contextual-rag-asistente-normativa-sincro/
 │   ├── setup_pinecone_index.py             # Pinecone configuration
 │   └── setup_project_structure.py          # Project initialization
 ├── tests/                                  # Test files
-├── src/output/                             # Processing results and reports
+├── src/output/                             # Organized processing outputs
+│   ├── analysis/                           # PDF analysis reports
+│   ├── evaluation/                         # RAG evaluation results
+│   └── rag/                                # RAG processing outputs
 ├── chainlit.md                             # Chainlit welcome screen and CSS
 └── pyproject.toml                          # Project dependencies
 ```
@@ -165,6 +168,12 @@ ai-contextual-rag-asistente-normativa-sincro/
 - **Error Handling**: Comprehensive error management
 - **Response Formatting**: Structured API responses
 
+#### 8. Output Organization (`src/output/`)
+- **Analysis Outputs** (`analysis/`): PDF analysis reports and statistics
+- **Evaluation Results** (`evaluation/`): RAG system performance metrics
+- **RAG Processing** (`rag/`): Enhanced chunks and contextualized content
+- **Structured Storage**: Organized by function for easy discovery and management
+
 ### Key Features
 
 #### Multilingual Support
@@ -207,6 +216,36 @@ MISTRAL_API_KEY=your_mistral_api_key
 - **OCR Model**: Mistral OCR for document processing
 - **Chunk Size**: Configurable text segmentation
 - **Vector Database**: Pinecone for similarity search
+
+#### Project Exclusions (.gitignore)
+The following directories and files are excluded from version control:
+
+**Data and Output Directories:**
+- `data/` - Raw regulatory documents and PDFs
+- `src/output/` - All processing results and generated content
+- `output/` - Legacy output directory
+
+**Generated Content:**
+- Analysis reports (Excel, JSON)
+- RAG processing results
+- Enhanced chunks and contextualized content
+- Evaluation outputs
+
+**Environment and Artifacts:**
+- `.env` - Environment variables and API keys
+- `.venv/`, `venv/` - Python virtual environments
+- `**/__pycache__/` - Python bytecode cache
+- `*.pyc`, `*.pyo` - Compiled Python files
+- `.DS_Store` - macOS system files
+- IDE configuration files (`.vscode/`, `.idea/`)
+
+**Large Files:**
+- `*.pdf` - PDF documents (stored in data/ directory)
+- `*.zip`, `*.tar.gz` - Compressed archives
+
+**Note:** `uv.lock` is **tracked** in version control to ensure reproducible builds and consistent dependency versions across all environments. This is important for regulatory compliance and team collaboration.
+
+**Note:** Output files are generated during processing and should not be committed to version control. The `data/` directory contains large regulatory documents that are processed by the system.
 
 ### Usage
 

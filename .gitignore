@@ -1,19 +1,69 @@
-.chainlit
-.files
-.venv
-venv
-/data
-# Output and generated files
+# Environment and virtual environments
+.venv/
+venv/
+.env
+
+# Chainlit and application files
+.chainlit/
+.files/
+
+# Data directories (contain large files and processed content)
+/data/
+data/
+
+# Output and generated files (all processing results)
 src/output/
 src/output/*
 src/output_bk*/
 src/output_bk*/*
 output/
 output/*
-.env
-.DS_Store
-uv.lock
-testing_stuff_out.py
-uv.lock
 
-**/__pycache__
+# Python artifacts
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+logs/
+temp/
+
+# Dependencies and lock files
+# Note: uv.lock is tracked for reproducible builds
+# requirements.txt
+# pyproject.toml
+
+# Test artifacts
+testing_stuff_out.py
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Large files and media
+*.pdf
+*.zip
+*.tar.gz
+*.rar
+*.7z
