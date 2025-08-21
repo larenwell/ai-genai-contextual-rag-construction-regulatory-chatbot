@@ -4,10 +4,8 @@ from pathlib import Path
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
 
 import chainlit as cl
-from llm.groq_llm import GroqLLM
 from llm.mistral_llm import MistralLLM
 from translation.translate import translate_text
-from embeddings.embedding_funcs import EmbeddingController
 from embeddings.embedding_qdrant import EmbeddingControllerQdrant
 from dotenv import load_dotenv
 from config.display_config import (
