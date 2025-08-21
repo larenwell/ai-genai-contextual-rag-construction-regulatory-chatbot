@@ -5,8 +5,10 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
 
 import chainlit as cl
 from llm.groq_llm import GroqLLM
+from llm.mistral_llm import MistralLLM
 from translation.translate import translate_text
 from embeddings.embedding_funcs import EmbeddingController
+from embeddings.embedding_qdrant import EmbeddingControllerQdrant
 from dotenv import load_dotenv
 from config.display_config import (
     get_display_config, get_emoji, get_relevance_icon, 
@@ -103,10 +105,9 @@ def create_enhanced_message(content, author="Asistente", elements=None):
     return message
 
 # Initialize LLM with default language
-llm = GroqLLM(groq_api_key=GROQ_API_KEY, language=LANGUAGE_CONFIG["default"])
-embedding_admin = EmbeddingController(model_name="nomic-embed-text", 
-                                      pinecone_api_key=PINECONE_API_KEY, 
-                                      pinecone_index=PINECONE_INDEX)
+# llm = GroqLLM(groq_api_key=GROQ_API_KEY, language=LANGUAGE_CONFIG["default"])
+llm = MistralLLM(api_key=os.getenv("MISTRAL_API_KEY"))
+embedding_admin = EmbeddingControllerQdrant()
 
 def detect_language(text: str) -> str:
     """
