@@ -118,9 +118,11 @@ SOURCE_FORMATTING = {
     "header": "### **Fuentes consultadas**\n",
     "use_separators": False,
     "source_template": {
-        "title": "{number}. ",
+        "title": "{number}. {relevance_icon} ",
         "document": "**`{title}`**",
-        "page": " p.{page}"
+        "page": " p.{page}",
+        "header": " - {header}",
+        "score": " _(relevancia: {score}%)_"
     },
     "separator": "\n"
 }
@@ -161,4 +163,4 @@ def get_random_suggestion():
 def format_error_message(error_type, **kwargs):
     """Format an error message."""
     template = ERROR_MESSAGES.get(error_type, "Error desconocido")
-    return template.format(**kwargs) 
+    return template.format(**kwargs)

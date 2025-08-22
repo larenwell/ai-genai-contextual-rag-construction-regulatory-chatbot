@@ -22,18 +22,18 @@ dependencies = [
   "huggingface_hub",
   "gradio",
   "tiktoken",
-  "chainlit",
+  "chainlit<2.6.0",
   "langchain-ollama",
   "langchain-community",
-  "pinecone",
   "mistralai",
   "openpyxl",
   "pypdf2",
   "ragas",
-  "groq",
   "asyncpg",
   "boto3",
-  "translate"
+  "translate",
+  "psutil",
+  "requests"
 ]
 
 [tool.uv]
