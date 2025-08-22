@@ -54,10 +54,14 @@ Un asistente virtual inteligente para consultas sobre normativa técnica en espa
 ## Requisitos
 
 ### Dependencias del Sistema
-- Python 3.12+
-- Docker (para Qdrant)
-- Ollama (para embeddings locales)
-- Memoria RAM: 8GB+ recomendado
+- **Python 3.12+** - Lenguaje principal del proyecto
+- **uv** - Gestor de paquetes y entornos virtuales de Python
+- **Node.js** - Runtime de JavaScript para herramientas de desarrollo
+- **npm** - Gestor de paquetes de Node.js
+- **npx** - Ejecutor de paquetes de Node.js
+- **Docker** - Contenedores para Qdrant, PostgreSQL, Ollama y LocalStack
+- **Docker Compose** - Orquestación de múltiples contenedores
+- **Memoria RAM**: 8GB+ recomendado
 
 ### Versiones de Dependencias
 - **Chainlit**: <2.6.0 (versión estable sin problemas de data layer)
@@ -65,6 +69,12 @@ Un asistente virtual inteligente para consultas sobre normativa técnica en espa
 - **Qdrant**: latest
 - **Ollama**: latest
 - **Mistral AI**: API v1
+
+### Herramientas de Desarrollo
+- **uv**: Gestor de paquetes Python moderno y rápido
+- **Node.js**: Para ejecutar Prisma Studio y herramientas de desarrollo
+- **npm/npx**: Gestión de dependencias de Node.js y ejecución de Prisma
+- **Docker**: Contenedores para todos los servicios (Qdrant, PostgreSQL, Ollama, LocalStack)
 
 ### Variables de Entorno
 ```bash
@@ -108,6 +118,13 @@ Esto crea el entorno virtual y el archivo uv.lock
 ```
 
 ### 4. Crear el archivo .env con las variables de entorno
+
+### ⚠️ Nota Importante sobre Herramientas
+**Todas las herramientas del sistema deben estar instaladas antes de proceder:**
+- **uv**: Necesario para `uv sync` y gestión de dependencias Python
+- **Node.js/npm**: Requerido para ejecutar `npx prisma studio`
+- **Docker**: Esencial para todos los servicios (Qdrant, PostgreSQL, Ollama, LocalStack)
+- **Ollama**: Necesario para embeddings locales con `nomic-embed-text`
 
 ## Despliegue de la solución
 
@@ -473,6 +490,10 @@ python3 evaluate_rag.py
 4. **Error de memoria**: Aumentar RAM o reducir batch_size
 5. **Error de puertos**: Verificar que los puertos 8000, 6333, 5555 no estén ocupados
 6. **Error de base de datos**: Verificar que PostgreSQL esté ejecutándose en chainlit-datalayer
+7. **Error de uv**: Verificar que uv esté instalado y en PATH
+8. **Error de Node.js**: Verificar que node y npm estén instalados
+9. **Error de Docker**: Verificar que Docker esté ejecutándose y el usuario esté en grupo docker
+10. **Error de Prisma**: Verificar que npx esté disponible y la base de datos esté accesible
 
 ### Problemas Conocidos con Chainlit 2.6.0+
 **IMPORTANTE**: Las versiones 2.6.0+ de Chainlit incluyen un data layer que requiere dependencias de Google Cloud Storage.
