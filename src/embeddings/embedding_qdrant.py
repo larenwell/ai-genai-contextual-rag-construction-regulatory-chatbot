@@ -1,4 +1,3 @@
-# Now instead of using Pinecone as the vectorized DB, we will use Qdrant
 import os
 import uuid
 import ollama

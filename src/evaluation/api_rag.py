@@ -5,24 +5,20 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
 import uvicorn
 from fastapi import FastAPI
 from dotenv import load_dotenv
-from llm.groq_llm import GroqLLM
+from llm.mistral_llm import MistralLLM
 from translation.translate import translate_text
-from embeddings.embedding_funcs import EmbeddingController
+from embeddings.embedding_qdrant import EmbeddingControllerQdrant
 
 project_root = Path(__file__).parent.parent
 sys.path.append(str(project_root))
 
 load_dotenv(project_root / '.env')
 
-PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
-PINECONE_INDEX = os.getenv("PINECONE_INDEX")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-
 app = FastAPI()
 
 # Initialize LLM with Spanish language for user interface
-llm = GroqLLM(groq_api_key=GROQ_API_KEY, language="español")
-embedding_admin = EmbeddingController(model_name="nomic-embed-text", pinecone_api_key=PINECONE_API_KEY, pinecone_index=PINECONE_INDEX)
+llm = MistralLLM(api_key=os.getenv("MISTRAL_API_KEY"))
+embedding_admin = EmbeddingControllerQdrant()
 
 def detect_language(text: str) -> str:
     """Simple language detection for Spanish vs English."""
@@ -63,8 +59,8 @@ def rag(data: dict):
         
         # 2) Search English KB using search query
         embed_question = embedding_admin.generate_embeddings(search_query)
-        context_response = embedding_admin.load_and_query_pinecone(embed_question, top_k=5)
-        context_texts = [match['metadata']['text'] for match in context_response['matches']]
+        context_response = embedding_admin.load_and_query_qdrant(embed_question, top_k=5)
+        context_texts = [match.payload['text'] for match in context_response]
         english_context = "\n".join(context_texts)
         
         print(f"📚 English KB context retrieved: {len(context_texts)} chunks")
@@ -77,7 +73,7 @@ def rag(data: dict):
         llm.language = "español"
         
         # 5) Generate Spanish response using English context + English question
-        answer = llm.rag_process_llm(context=english_context, question=search_query)
+        answer = llm.mistral_chat(context=english_context, question=search_query)
         
         print(f"✅ Spanish response generated successfully")
         
@@ -98,11 +94,10 @@ def rag(data: dict):
         return {
             "error": f"RAG processing failed: {str(e)}",
             "workflow_info": {
-                "user_language": detected_language if 'detected_language' in locals() else "unknown",
-                "search_language": "english",
-                "response_language": "español"
+                "status": "failed",
+                "error_details": str(e)
             }
         }
-    
+
 if __name__ == "__main__":
-    uvicorn.run("api_rag:app", host="localhost", port=8001, reload=True)
+    uvicorn.run(app, host="0.0.0.0", port=8001)

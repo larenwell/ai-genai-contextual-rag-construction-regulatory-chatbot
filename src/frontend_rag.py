@@ -19,10 +19,6 @@ sys.path.append(str(project_root))
 
 load_dotenv(project_root / '.env')
 
-PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
-PINECONE_INDEX = os.getenv("PINECONE_INDEX")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-
 # Load display configuration
 DISPLAY_CONFIG = get_display_config()
 
@@ -105,8 +101,7 @@ def create_enhanced_message(content, author="Asistente", elements=None):
     
     return message
 
-# Initialize LLM with default language
-# llm = GroqLLM(groq_api_key=GROQ_API_KEY, language=LANGUAGE_CONFIG["default"])
+# Initialize LLM and embedding controller
 llm = MistralLLM(api_key=os.getenv("MISTRAL_API_KEY"))
 embedding_admin = EmbeddingControllerQdrant()
 
@@ -237,7 +232,7 @@ async def main(message: cl.Message):
             message.content, detected_language
         )
         
-        # 5) Extract context from Pinecone using optimized search query
+        # 5) Extract context from Qdrant using optimized search query
         embed_question = embedding_admin.generate_embeddings(search_query)
         context_response = embedding_admin.load_and_query_qdrant(embed_question, top_k=5)
 
