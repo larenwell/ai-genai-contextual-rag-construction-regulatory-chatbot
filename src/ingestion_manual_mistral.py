@@ -3,7 +3,6 @@ import sys
 import json
 from pathlib import Path
 from dotenv import load_dotenv
-from embeddings.embedding_funcs import EmbeddingController
 from embeddings.embedding_qdrant import EmbeddingControllerQdrant
 from ingestion.ingest_mistral import MistralExtractionController
 
@@ -15,8 +14,6 @@ sys.path.append(str(project_root))
 load_dotenv(project_root / '.env')
 
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
-PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
-PINECONE_INDEX = os.getenv("PINECONE_INDEX")
 PDF_FOLDER_PATH = os.getenv("PDF_FOLDER_PATH", "./pdfs")
 
 OUTPUT_DIR = Path("./output")
@@ -59,21 +56,11 @@ def test_full_mistral_pipeline(pdf_path):
     if not MISTRAL_API_KEY:
         print("Error: MISTRAL_API_KEY is not configured")
         return
-    
-    if not PINECONE_API_KEY:
-        print("Error: PINECONE_API_KEY is not configured")
-        return
 
     print(f"File found: {pdf_path}")
     print(f"MISTRAL_API_KEY configured: {'Yes' if MISTRAL_API_KEY else 'No'}")
-    print(f"PINECONE_API_KEY configured: {'Yes' if PINECONE_API_KEY else 'No'}")
 
     mistral_controller = MistralExtractionController(api_key=MISTRAL_API_KEY)
-    # embedding_controller = EmbeddingController(
-    #     model_name="nomic-embed-text", 
-    #     pinecone_api_key=PINECONE_API_KEY, 
-    #     pinecone_index=PINECONE_INDEX
-    # )
     embedding_controller = EmbeddingControllerQdrant()
 
     try:
@@ -113,7 +100,7 @@ def test_full_mistral_pipeline(pdf_path):
 
         # Store embeddings
         embedding_controller.store_embeddings(embeddings, enhanced_chunks, chunk_metadata=[chunk.get("metadata", {}) for chunk in enhanced_chunks])
-        print("Storage in Pinecone completed successfully.")
+        print("Storage in vectorized db completed successfully.")
 
     except Exception as e:
         print(f"Error processing document: {str(e)}")
