@@ -24,6 +24,7 @@ output/*
 # Evaluation results and test outputs
 src/evaluation/evaluation_results/
 src/evaluation/test_evaluation_results/
+src/evaluation/data/
 src/evaluation/*.log
 evaluation_results/
 test_evaluation_results/
