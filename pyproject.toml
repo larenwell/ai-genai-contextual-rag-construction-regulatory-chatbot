@@ -1,18 +1,26 @@
 [project]
 name = "asistente-normativa-prototipo"
 version = "0.1.0"
-description = "Asistente virtual de normativa en español"
+description = "Asistente virtual de normativa"
 authors = [{ name = "Laren Osorio Toribio", email = "losorio@rcp.pe" }]
 requires-python = ">=3.12"
 
 dependencies = [
+  "pymupdf",
+  "unstructured",
+  "sentence-transformers",
   "qdrant-client",
   "langchain",
+  "transformers",
+  "accelerate",
   "ollama",
+  "streamlit",
   "python-dotenv",
   "tqdm",
+  "scikit-learn",
   "pandas",
   "huggingface_hub",
+  "gradio",
   "tiktoken",
   "chainlit<2.6.0",
   "langchain-ollama",
