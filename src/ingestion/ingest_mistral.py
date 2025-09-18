@@ -2,9 +2,51 @@ import os
 import re
 import base64
 import json
+import time
 from mistralai import Mistral
 from langchain.text_splitter import RecursiveCharacterTextSplitter, MarkdownHeaderTextSplitter
 from typing import Dict, List, Optional, Any
+
+
+def print_stage_title(title: str, stage_number: int = None):
+    """Print a beautiful stage title with visual separators"""
+    if stage_number:
+        print(f"\n{'='*80}")
+        print(f"🚀 ETAPA {stage_number}: {title}")
+        print(f"{'='*80}")
+    else:
+        print(f"\n{'='*80}")
+        print(f"🎯 {title}")
+        print(f"{'='*80}")
+
+
+def print_sub_stage(title: str):
+    """Print a sub-stage title"""
+    print(f"\n📋 {title}")
+    print(f"{'-'*60}")
+
+
+def retry_with_backoff(func, max_retries=3, base_delay=1):
+    """Retry function with exponential backoff"""
+    for attempt in range(max_retries):
+        try:
+            return func()
+        except Exception as e:
+            if attempt == max_retries - 1:
+                raise e
+            
+            # Check if it's a retryable error (5xx server errors)
+            if hasattr(e, 'status_code') and e.status_code >= 500:
+                delay = base_delay * (2 ** attempt)
+                print(f"⚠️  Error temporal (intento {attempt + 1}/{max_retries}): {str(e)}")
+                print(f"⏳ Reintentando en {delay} segundos...")
+                time.sleep(delay)
+                continue
+            else:
+                # Non-retryable error, raise immediately
+                raise e
+    
+    return None
 
 
 class MistralExtractionController:
@@ -48,20 +90,20 @@ class MistralExtractionController:
                 print(f"Error: El archivo {pdf_path} no existe")
                 return None
                 
-            print(f"Processing file: {pdf_path}")
+            print(f"📄 Archivo: {pdf_path}")
             
             # Encode PDF to base64
-            print("Encoding PDF to base64...")
+            print_sub_stage("CODIFICACIÓN PDF A BASE64")
             base64_pdf = self.encode_pdf(pdf_path)
             if not base64_pdf:
                 return None
             
-            # Call OCR API
-            print("Processing with Mistral OCR...")
-            print(f"PDF size in base64: {len(base64_pdf)} characters")
+            # Call OCR API with retry mechanism
+            print_sub_stage("PROCESAMIENTO CON MISTRAL OCR")
+            print(f"📊 Tamaño PDF en base64: {len(base64_pdf)} caracteres")
             
-            try:
-                pdf_response = self.mistral_client.ocr.process(
+            def call_mistral_ocr():
+                return self.mistral_client.ocr.process(
                     model="mistral-ocr-latest",
                     document={
                         "type": "document_url",
@@ -69,9 +111,14 @@ class MistralExtractionController:
                     },
                     include_image_base64=True  # Important: This ensures images are included
                 )
+            
+            try:
+                pdf_response = retry_with_backoff(call_mistral_ocr, max_retries=3, base_delay=2)
+                if pdf_response is None:
+                    raise Exception("Failed after all retry attempts")
                 print("✅ Mistral OCR response received")
             except Exception as api_error:
-                print(f"❌ Error in Mistral OCR call: {str(api_error)}")
+                print(f"❌ Error in Mistral OCR call after retries: {str(api_error)}")
                 print(f"📋 Error type: {type(api_error).__name__}")
                 raise
             
@@ -492,37 +539,45 @@ IMPORTANT: Keep the original technical language and specific concepts.
         if not book_title:
             book_title = os.path.basename(pdf_path)
         
-        print(f"=== Processing document: {book_title} ===")
+        print_stage_title(f"PROCESANDO DOCUMENTO: {book_title}")
         
-        # 1. OCR Extraction
-        print("1. Extracting content with Mistral OCR...")
+        # 1.1 OCR Extraction
+        print_sub_stage("1.1 EXTRACCIÓN DE CONTENIDO CON MISTRAL OCR")
         extraction_result = self.extract_content_mistral_ocr(pdf_path)
         if not extraction_result:
             return None
         
-        # 2. Generate summary
-        print("2. Generating document summary...")
+        # 1.2 Generate summary
+        print_sub_stage("1.2 GENERACIÓN DE RESUMEN DEL DOCUMENTO")
         document_summary = self.generate_document_summary(extraction_result["markdown_content"])
         
-        # 3. Intelligent chunking
-        print("3. Performing intelligent chunking...")
+        # 1.3 Intelligent chunking
+        print_sub_stage("1.3 DIVISIÓN INTELIGENTE EN CHUNKS")
         chunks = self.intelligent_chunking(extraction_result["markdown_content"])
-        print(f"   Generated {len(chunks)} chunks")
+        print(f"   ✅ Generados {len(chunks)} chunks")
         
-        # 4. Contextualize chunks
-        print("4. Contextualizing chunks...")
+        # 1.4 Contextualize chunks
+        print_sub_stage("1.4 CONTEXTUALIZACIÓN DE CHUNKS")
         enhanced_chunks = []
         for i, chunk in enumerate(chunks):
-            print(f"   Processing chunk {i+1}/{len(chunks)}")
+            print(f"   🔄 Procesando chunk {i+1}/{len(chunks)}")
             enhanced_chunk = self.contextualize_chunk(
                 chunk, document_summary, book_title
             )
             enhanced_chunks.append(enhanced_chunk)
+            
+            # Mostrar progreso cada 10 chunks
+            if (i + 1) % 10 == 0 or (i + 1) == len(chunks):
+                print(f"      ✅ Completados: {i+1}/{len(chunks)} chunks")
         
         # Summary of images included
         total_chunks_with_images = sum(1 for chunk in enhanced_chunks if chunk["metadata"]["has_associated_images"])
         
-        print(f"Process completed: {len(enhanced_chunks)} contextualized chunks")
-        print(f"Chunks with images: {total_chunks_with_images}/{len(enhanced_chunks)}")
+        # 1.5 Final Summary
+        print_sub_stage("1.5 RESUMEN FINAL DEL PROCESO")
+        print(f"   📊 Total de chunks procesados: {len(enhanced_chunks)}")
+        print(f"   🖼️  Chunks con imágenes: {total_chunks_with_images}/{len(enhanced_chunks)}")
+        print(f"   📄 Páginas procesadas: {extraction_result.get('total_pages', 'N/A')}")
+        print(f"   📝 Contenido total extraído: {len(extraction_result.get('markdown_content', ''))} caracteres")
         
         return enhanced_chunks

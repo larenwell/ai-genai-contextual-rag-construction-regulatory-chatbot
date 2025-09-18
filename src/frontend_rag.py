@@ -4,9 +4,9 @@ from pathlib import Path
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
 
 import chainlit as cl
-from llm.groq_llm import GroqLLM
+from llm.mistral_llm import MistralLLM
 from translation.translate import translate_text
-from embeddings.embedding_funcs import EmbeddingController
+from embeddings.embedding_qdrant import EmbeddingControllerQdrant
 from dotenv import load_dotenv
 from config.display_config import (
     get_display_config, get_emoji, get_relevance_icon, 
@@ -19,45 +19,44 @@ sys.path.append(str(project_root))
 
 load_dotenv(project_root / '.env')
 
-PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
-PINECONE_INDEX = os.getenv("PINECONE_INDEX")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-
 # Load display configuration
 DISPLAY_CONFIG = get_display_config()
 
 def format_sources_for_display(context_results):
-    """Format sources with clean markdown and proper spacing."""
-    if not context_results or 'matches' not in context_results:
-        return DISPLAY_CONFIG["error_messages"]["no_sources"]
-    
-    matches = context_results['matches']
-    if not matches:
+    if not context_results:  # Just check if the list is empty
         return DISPLAY_CONFIG["error_messages"]["no_sources"]
     
     try:
         # Limit sources based on configuration
         max_sources = DISPLAY_CONFIG["source_display"].get("max_sources_displayed", 5)
-        matches = matches[:max_sources]
+        matches = context_results[:max_sources]  # Slice the list directly
         
         # Create a clean sources display with markdown
         sources_text = DISPLAY_CONFIG["source_formatting"].get("header", "### **Fuentes consultadas**\n")
         
         # Add sources as a clean numbered list
         for i, match in enumerate(matches, 1):
-            metadata = match.get('metadata', {})
+            metadata = match.payload
             
+            # Extract metadata safely with defaults
             title = metadata.get('book_title', 'Sin título')
-            page = int(metadata.get('page_number', 0)) if metadata.get('page_number') else 'N/A'
+            page = metadata.get('page_number', 'N/A')
+            header = metadata.get('Header 3') or metadata.get('Header 1', '')
+            header_info = f" - {header}" if header else ""
             
-            # Clean markdown format: number. **filename** p.page (filename in bold with inline code style)
-            sources_text += f"{i}. **`{title}`** p.{page}\n"
+            # Calculate score percentage
+            score = float(match.score)  # Ensure score is float
+            score_percentage = int(score * 100)
+            relevance_icon = get_relevance_icon(score_percentage)
+            
+            # Format source line using template
+            source_line = f"{i}. {relevance_icon} **`{title}`** p.{page}{header_info} _(relevancia: {score_percentage}%)_\n"
+            sources_text += source_line
         
         return sources_text
         
     except Exception as e:
-        print(f"Error formatting sources: {e}")
-        # Return a simple fallback format
+        print(f"Error formatting sources: {e}")  # Debug log
         return "### **Fuentes consultadas**\n\n*Error al formatear las fuentes. Consulte los logs para más detalles.*"
 
 def format_main_response(response_text):
@@ -102,11 +101,9 @@ def create_enhanced_message(content, author="Asistente", elements=None):
     
     return message
 
-# Initialize LLM with default language
-llm = GroqLLM(groq_api_key=GROQ_API_KEY, language=LANGUAGE_CONFIG["default"])
-embedding_admin = EmbeddingController(model_name="nomic-embed-text", 
-                                      pinecone_api_key=PINECONE_API_KEY, 
-                                      pinecone_index=PINECONE_INDEX)
+# Initialize LLM and embedding controller
+llm = MistralLLM(api_key=os.getenv("MISTRAL_API_KEY"))
+embedding_admin = EmbeddingControllerQdrant()
 
 def detect_language(text: str) -> str:
     """
@@ -235,10 +232,15 @@ async def main(message: cl.Message):
             message.content, detected_language
         )
         
-        # 5) Extract context from Pinecone using optimized search query
+        # 5) Extract context from Qdrant using optimized search query
         embed_question = embedding_admin.generate_embeddings(search_query)
-        context_response = embedding_admin.load_and_query_pinecone(embed_question, top_k=5)
-        context_texts = [match['metadata']['text'] for match in context_response['matches']]
+        context_response = embedding_admin.load_and_query_qdrant(embed_question, top_k=5)
+
+        print("Context response type:", type(context_response))
+        if context_response:
+            print("First match payload:", context_response[0].payload if context_response else "No matches")
+
+        context_texts = [match.payload['text'] for match in context_response]
         context = "\n".join(context_texts)
 
         print(f"Context: {context}")
@@ -255,7 +257,7 @@ async def main(message: cl.Message):
         llm.language = "español"
         
         # 8) RAG pipeline with English context + English question, Spanish response
-        respuesta = llm.rag_process_llm(context=context, question=search_query)
+        respuesta = llm.mistral_chat(context=context, question=search_query)
 
         # 7) Create enhanced main response
         formatted_response = format_main_response(respuesta)
@@ -266,7 +268,9 @@ async def main(message: cl.Message):
         await main_message.send()
         
         # 6) Display sources with enhanced formatting if configured
-        if DISPLAY_CONFIG["visual_elements"].get("source_attribution", True) and context_response and context_response.get('matches'):
+        if DISPLAY_CONFIG["visual_elements"].get("source_attribution", True):
+            print(f"Number of sources found: {len(context_response) if context_response else 0}")
+            
             sources_content = format_sources_for_display(context_response)
             sources_message = create_enhanced_message(
                 content=sources_content,

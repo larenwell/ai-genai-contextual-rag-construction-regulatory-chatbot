@@ -194,7 +194,7 @@ class PDFAnalyzer:
         
         return results
     
-    def generate_excel_report(self, results: List[Dict[str, Any]], output_file: str = "pdf_analysis_report.xlsx"):
+    def generate_excel_report(self, results: List[Dict[str, Any]], output_file: str = "normativa_analysis_report.xlsx"):
         """Generate Excel report with PDF analysis results"""
         if not results:
             print("No results to export")
@@ -261,9 +261,9 @@ class PDFAnalyzer:
         # Reorder columns
         df = df[column_order]
         
-        # Create output directory
-        output_dir = Path("output")
-        output_dir.mkdir(exist_ok=True)
+        # Create organized output directory structure
+        output_dir = Path("src/output/analysis")
+        output_dir.mkdir(parents=True, exist_ok=True)
         
         output_path = output_dir / output_file
         
@@ -363,14 +363,15 @@ class PDFAnalyzer:
         
         folder_stats.to_excel(writer, sheet_name='Folder Statistics', index=False)
     
-    def generate_json_report(self, results: List[Dict[str, Any]], output_file: str = "pdf_analysis_report.json"):
+    def generate_json_report(self, results: List[Dict[str, Any]], output_file: str = "normativa_analysis_report.json"):
         """Generate JSON report with PDF analysis results"""
         if not results:
             print("No results to export")
             return
         
-        output_dir = Path("output")
-        output_dir.mkdir(exist_ok=True)
+        # Create organized output directory structure
+        output_dir = Path("src/output/analysis")
+        output_dir.mkdir(parents=True, exist_ok=True)
         
         output_path = output_dir / output_file
         

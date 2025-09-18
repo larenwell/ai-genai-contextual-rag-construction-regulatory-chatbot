@@ -1,7 +1,7 @@
 [project]
-name = "contextual-rag-asistente-normativa"
+name = "asistente-normativa-prototipo"
 version = "0.1.0"
-description = "Asistente virtual de normativa en español con fuentes en inglés con Contextual RAG + Pinecone + Chainlit + Groq"
+description = "Asistente virtual de normativa en español"
 authors = [{ name = "Laren Osorio Toribio", email = "losorio@rcp.pe" }]
 requires-python = ">=3.12"
 
@@ -14,32 +14,19 @@ dependencies = [
   "pandas",
   "huggingface_hub",
   "tiktoken",
-  "chainlit",
+  "chainlit<2.6.0",
   "langchain-ollama",
   "langchain-community",
-  "pinecone",
-  "groq",
-  "translate",
+  "mistralai",
+  "openpyxl",
+  "pypdf2",
   "ragas",
-  "asyncpg>=0.30.0",
-  "boto3>=1.40.11",
+  "asyncpg",
+  "boto3",
+  "translate",
+  "psutil",
+  "requests"
 ]
 
 [tool.uv]
 managed = true
-
-[dependency-groups]
-local = [
-    "accelerate>=1.10.0",
-    "datasets>=4.0.0",
-    "gradio>=5.42.0",
-    "pyarrow>=21.0.0",
-    "pymupdf>=1.26.3",
-    "scikit-learn>=1.7.1",
-    "scipy>=1.16.1",
-    "sentence-transformers>=5.1.0",
-    "streamlit>=1.48.1",
-    "torch>=2.8.0",
-    "transformers>=4.55.2",
-    "unstructured>=0.18.13",
-]
