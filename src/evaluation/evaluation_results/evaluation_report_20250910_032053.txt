@@ -1,0 +1,87 @@
+================================================================================
+REPORTE DE EVALUACIÓN RAG CON RAGAS
+================================================================================
+Fecha: 2025-09-10 10:21:12
+Total de preguntas: 64
+Evaluaciones exitosas: 64
+Evaluaciones fallidas: 0
+
+MÉTRICAS GENERALES
+----------------------------------------
+Faithfulness (Fidelidad): 0.690
+Answer Relevancy (Relevancia): 0.239
+Context Precision (Precisión): 0.221
+Context Recall (Recuperación): 0.260
+Answer Correctness (Correctitud): 0.241
+Tiempo promedio API: 6.58s
+
+MÉTRICAS POR TIPO DE PREGUNTA
+----------------------------------------
+
+EXACTITUD FIDELIDAD (8 preguntas)
+  Faithfulness: 0.771 (min: 0.333, max: 1.000)
+  Answer Relevancy: 0.357 (min: 0.000, max: 0.742)
+  Context Precision: 0.312 (min: 0.000, max: 1.000)
+  Context Recall: 0.375 (min: 0.000, max: 1.000)
+  Answer Correctness: 0.315 (min: 0.124, max: 0.760)
+  Tiempo API promedio: 6.05s
+
+NEGACIONES CONTRADICCIONES (8 preguntas)
+  Faithfulness: 0.691 (min: 0.222, max: 0.909)
+  Answer Relevancy: 0.176 (min: 0.000, max: 0.590)
+  Context Precision: 0.250 (min: 0.000, max: 1.000)
+  Context Recall: 0.104 (min: 0.000, max: 0.500)
+  Answer Correctness: 0.269 (min: 0.091, max: 0.610)
+  Tiempo API promedio: 6.44s
+
+DESAMBIGUACION (8 preguntas)
+  Faithfulness: 0.838 (min: 0.722, max: 1.000)
+  Answer Relevancy: 0.496 (min: 0.393, max: 0.712)
+  Context Precision: 0.240 (min: 0.000, max: 1.000)
+  Context Recall: 0.188 (min: 0.000, max: 1.000)
+  Answer Correctness: 0.277 (min: 0.098, max: 0.851)
+  Tiempo API promedio: 8.22s
+
+ADVERSARIALES SEGURIDAD (8 preguntas)
+  Faithfulness: 0.620 (min: 0.188, max: 0.889)
+  Answer Relevancy: 0.202 (min: 0.000, max: 0.638)
+  Context Precision: 0.342 (min: 0.000, max: 1.000)
+  Context Recall: 0.375 (min: 0.000, max: 1.000)
+  Answer Correctness: 0.208 (min: 0.095, max: 0.420)
+  Tiempo API promedio: 6.97s
+
+CONTEXTO INCOMPLETO (8 preguntas)
+  Faithfulness: 0.543 (min: 0.286, max: 0.810)
+  Answer Relevancy: 0.000 (min: 0.000, max: 0.000)
+  Context Precision: 0.375 (min: 0.000, max: 1.000)
+  Context Recall: 0.542 (min: 0.000, max: 1.000)
+  Answer Correctness: 0.323 (min: 0.117, max: 0.756)
+  Tiempo API promedio: 5.87s
+
+ROBUSTEZ REFORMULACIONES (24 preguntas)
+  Faithfulness: 0.686 (min: 0.000, max: 1.000)
+  Answer Relevancy: 0.227 (min: 0.000, max: 0.564)
+  Context Precision: 0.083 (min: 0.000, max: 1.000)
+  Context Recall: 0.167 (min: 0.000, max: 1.000)
+  Answer Correctness: 0.178 (min: 0.085, max: 0.401)
+  Tiempo API promedio: 6.38s
+
+CASOS PROBLEMÁTICOS
+----------------------------------------
+
+Preguntas con Faithfulness < 0.5 (10 casos):
+  - What is the phone number of the FM Global technical support ... (Score: 0.286)
+  - ¿Cuál es el número de modelo específico del cromatógrafo de ... (Score: 0.333)
+  - What is the timeframe established for mining activity holder... (Score: 0.333)
+  - What are the new modifications that will be approved in the ... (Score: 0.273)
+  - What is the specific address of the Ministry of Energy and M... (Score: 0.333)
+
+RECOMENDACIONES
+----------------------------------------
+- Mejorar la fidelidad: El sistema genera respuestas que no están bien fundamentadas en el contexto
+- Mejorar la relevancia: Las respuestas no son suficientemente relevantes para las preguntas
+- Mejorar la precisión del contexto: El sistema recupera contexto irrelevante
+- Mejorar la recuperación: El sistema no encuentra todo el contexto relevante
+- Mejorar la correctitud: Las respuestas contienen información incorrecta
+
+================================================================================

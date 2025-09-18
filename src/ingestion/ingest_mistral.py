@@ -64,9 +64,9 @@ class MistralExtractionController:
         )
         
         self.char_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=200,
-            separators=["\n\n", "\n", " ", ""]
+            chunk_size=500,        # Optimizado: reducido de 1000
+            chunk_overlap=100,     # Optimizado: reducido de 200
+            separators=["\n\n", "\n", ". ", " "]  # Optimizado: mejor separación
         )
         
         # Store page images for later use
@@ -335,7 +335,7 @@ class MistralExtractionController:
                             })
                             
                             # If chunk is too large, split it further
-                            if len(content) > 1200:
+                            if len(content) > 600:  # Optimizado: reducido de 1200
                                 sub_chunks = self.char_splitter.split_text(content)
                                 for j, sub_chunk in enumerate(sub_chunks):
                                     sub_metadata = metadata.copy()
@@ -479,23 +479,17 @@ class MistralExtractionController:
 DOCUMENT: {book_title}
 PAGE: {page_num}
 
-DOCUMENT SUMMARY:
-{document_summary}
-
 FRAGMENT CONTENT:
 {chunk_content}
 
-VISUAL ELEMENTS: {visual_summary}
-
 INSTRUCTIONS:
-Create a contextualized summary of this fragment that:
-1. Explains the content in relation to the complete document
-2. Preserves key technical information
-3. Briefly describes visual elements if they exist
-4. Maintains specific terminology for search
-5. Is concise but informative (maximum 300 words)
+Create a brief contextual summary (max 100 words) that:
+1. Preserves the original technical language and specific terminology
+2. Maintains exact numbers, codes, and references
+3. Adds minimal context for understanding
+4. Keeps the original structure and formatting intact
 
-IMPORTANT: Keep the original technical language and specific concepts.
+IMPORTANT: Do not paraphrase technical terms or change specific values.
 """
         
         try:

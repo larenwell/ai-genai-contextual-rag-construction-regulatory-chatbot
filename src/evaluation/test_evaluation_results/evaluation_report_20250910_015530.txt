@@ -1,0 +1,45 @@
+================================================================================
+REPORTE DE EVALUACIÓN RAG CON RAGAS
+================================================================================
+Fecha: 2025-09-10 01:55:30
+Total de preguntas: 3
+Evaluaciones exitosas: 3
+Evaluaciones fallidas: 0
+
+MÉTRICAS GENERALES
+----------------------------------------
+Faithfulness (Fidelidad): 0.863
+Answer Relevancy (Relevancia): 0.577
+Context Precision (Precisión): 1.000
+Context Recall (Recuperación): 0.833
+Answer Correctness (Correctitud): 0.529
+Tiempo promedio API: 5.30s
+
+MÉTRICAS POR TIPO DE PREGUNTA
+----------------------------------------
+
+EXACTITUD FIDELIDAD (2 preguntas)
+  Faithfulness: 0.861 (min: 0.833, max: 0.889)
+  Answer Relevancy: 0.634 (min: 0.584, max: 0.684)
+  Context Precision: 1.000 (min: 1.000, max: 1.000)
+  Context Recall: 1.000 (min: 1.000, max: 1.000)
+  Answer Correctness: 0.511 (min: 0.473, max: 0.549)
+  Tiempo API promedio: 5.18s
+
+NEGACIONES CONTRADICCIONES (1 preguntas)
+  Faithfulness: 0.867 (min: 0.867, max: 0.867)
+  Answer Relevancy: 0.463 (min: 0.463, max: 0.463)
+  Context Precision: 1.000 (min: 1.000, max: 1.000)
+  Context Recall: 0.500 (min: 0.500, max: 0.500)
+  Answer Correctness: 0.564 (min: 0.564, max: 0.564)
+  Tiempo API promedio: 5.53s
+
+CASOS PROBLEMÁTICOS
+----------------------------------------
+
+RECOMENDACIONES
+----------------------------------------
+- Mejorar la relevancia: Las respuestas no son suficientemente relevantes para las preguntas
+- Mejorar la correctitud: Las respuestas contienen información incorrecta
+
+================================================================================

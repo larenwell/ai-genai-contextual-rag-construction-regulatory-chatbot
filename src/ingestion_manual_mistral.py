@@ -168,7 +168,7 @@ def test_full_mistral_pipeline(pdf_path):
 
 # === Operar el pipeline en todos los PDFs de una carpeta ===
 def operate_in_folder(pdf_folder_path):
-    pdf_files = [f for f in os.listdir(pdf_folder_path) if f.endswith(".pdf")]
+    pdf_files = [f for f in os.listdir(pdf_folder_path) if f.lower().endswith(".pdf")]
     total_files = len(pdf_files)
     
     print_stage_title(f"PROCESAMIENTO DE CARPETA: {pdf_folder_path}")
@@ -200,7 +200,6 @@ def operate_in_folder(pdf_folder_path):
             print(f"\n{'='*60}")
             print(f"⏳ ESPERANDO 2 SEGUNDOS ANTES DEL SIGUIENTE ARCHIVO...")
             print(f"{'='*60}")
-            import time
             time.sleep(2)
     
     print_stage_title("PROCESAMIENTO COMPLETADO")
@@ -289,7 +288,7 @@ if __name__ == "__main__":
     import sys
     
     # Override PDF_FOLDER_PATH with correct path
-    correct_pdf_path = "data/test"
+    correct_pdf_path = "../data/test"
     
     if len(sys.argv) > 1 and sys.argv[1] == "--retry":
         print("🔄 Modo de reintento activado")
