@@ -10,6 +10,8 @@ venv/
 # Data directories (contain large files and processed content)
 /data/
 data/
+data/*.pdf
+data/**/*.pdf
 
 # Output and generated files (all processing results)
 src/output/
@@ -18,6 +20,13 @@ src/output_bk*/
 src/output_bk*/*
 output/
 output/*
+
+# Evaluation results and test outputs
+src/evaluation/evaluation_results/
+src/evaluation/test_evaluation_results/
+src/evaluation/*.log
+evaluation_results/
+test_evaluation_results/
 
 # Python artifacts
 **/__pycache__/
