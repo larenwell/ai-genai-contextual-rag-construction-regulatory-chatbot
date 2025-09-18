@@ -1,5 +1,5 @@
 [project]
-name = "asistente-normativa-prototipo"
+name = "ai-genai-rag-asistente-normativa-sincro"
 version = "0.1.0"
 description = "Asistente virtual de normativa"
 authors = [{ name = "Laren Osorio Toribio", email = "losorio@rcp.pe" }]
