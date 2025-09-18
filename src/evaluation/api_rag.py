@@ -63,6 +63,18 @@ def rag(data: dict):
         context_texts = [match.payload['text'] for match in context_response]
         english_context = "\n".join(context_texts)
         
+        # Extract context metadata (sources)
+        context_sources = []
+        for match in context_response:
+            source_info = {
+                "text": match.payload.get('text', ''),
+                "book_title": match.payload.get('book_title', 'Unknown'),
+                "page_number": match.payload.get('page_number', 'Unknown'),
+                "chunk_id": match.payload.get('chunk_id', 'Unknown'),
+                "score": match.score
+            }
+            context_sources.append(source_info)
+        
         print(f"📚 English KB context retrieved: {len(context_texts)} chunks")
         
         # 3) Keep English context and use English question for optimal LLM processing
@@ -79,7 +91,9 @@ def rag(data: dict):
         
         return {
             "answer": answer,
-            "relevant_docs": context_texts,
+            "context": context_texts,
+            "relevant_docs": context_texts,  # Mantener compatibilidad
+            "context_sources": context_sources,
             "workflow_info": {
                 "user_language": detected_language,
                 "search_language": "english",
